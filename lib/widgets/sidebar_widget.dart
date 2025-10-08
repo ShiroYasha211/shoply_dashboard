@@ -92,9 +92,9 @@ class SidebarWidget extends StatelessWidget {
       _MenuItem(Icons.inventory_2_outlined, 'المنتجات', 2),
       _MenuItem(Icons.category_outlined, 'الفئات', 3),
       _MenuItem(Icons.shopping_cart_outlined, 'الطلبات', 4),
-      _MenuItem(Icons.star_outline, 'التقييمات', 5),
-      _MenuItem(Icons.notifications_outlined, 'الإشعارات', 6),
-      _MenuItem(Icons.settings_outlined, 'الإعدادات', 7),
+      // _MenuItem(Icons.star_outline, 'التقييمات', 5),
+      //_MenuItem(Icons.notifications_outlined, 'الإشعارات', 6),
+      // _MenuItem(Icons.settings_outlined, 'الإعدادات', 7),
     ];
 
     return SingleChildScrollView(

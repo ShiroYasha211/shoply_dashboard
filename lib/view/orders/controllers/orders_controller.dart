@@ -14,6 +14,12 @@ class OrdersController extends GetxController {
   final searchQuery = ''.obs;
   final selectedStatus = 'all'.obs;
 
+  var areWidgetsCollapsed = false.obs;
+
+  void toggleWidgetsCollapse() {
+    areWidgetsCollapsed.value = !areWidgetsCollapsed.value;
+  }
+
   @override
   void onInit() {
     super.onInit();

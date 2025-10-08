@@ -150,7 +150,7 @@ class MainView extends StatelessWidget {
           // Page Title
           Expanded(
             child: Text(
-              'لوحة التحكم',
+              'Shoply',
               style: TextStyle(
                 fontSize: isMobile ? 18 : (isTablet ? 22 : 24),
                 fontWeight: FontWeight.bold,

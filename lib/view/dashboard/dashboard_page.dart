@@ -22,10 +22,6 @@ class DashboardView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          'لوحة التحكم',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
         backgroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
@@ -123,7 +119,7 @@ class DashboardView extends StatelessWidget {
     bool isSmallScreen,
     bool isMediumScreen,
   ) {
-    final crossAxisCount = isSmallScreen ? 2 : (isMediumScreen ? 3 : 4);
+    final crossAxisCount = isSmallScreen ? 4 : (isMediumScreen ? 4 : 6);
 
     return GridView.count(
       shrinkWrap: true,

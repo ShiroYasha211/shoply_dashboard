@@ -22,6 +22,18 @@ class ProductController extends GetxController {
   final selectedCategoryForAddingProduct = 'all'.obs;
   final selectedSubcategoryForAddingProduct = 'all'.obs;
 
+  var isFilterExpanded = false.obs;
+
+  void toggleFilterExpanded() {
+    isFilterExpanded.value = !isFilterExpanded.value;
+  }
+
+  var areWidgetsCollapsed = false.obs;
+
+  void toggleWidgetsCollapse() {
+    areWidgetsCollapsed.value = !areWidgetsCollapsed.value;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -377,7 +389,7 @@ class ProductController extends GetxController {
           'لا يمكن الحذف',
           'لا يمكن حذف هذا المنتج لأنه مرتبط بطلبات أو عمليات بيع',
           snackPosition: SnackPosition.BOTTOM,
-          duration: Duration(seconds: 5),
+          duration: const Duration(seconds: 5),
         );
       } else {
         Get.snackbar(

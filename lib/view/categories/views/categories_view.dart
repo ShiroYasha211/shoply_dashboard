@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 import '../../../data/models/category_model.dart';
 import '../controllers/categories_controller.dart';
 import '../../../themes/app_theme.dart';
@@ -11,85 +12,177 @@ class CategoriesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CategoryController controller = Get.put(CategoryController());
-    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
-      body: Padding(
-        padding: EdgeInsets.all(isMobile ? 16 : 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
+      body: ResponsiveBuilder(
+        builder: (context, sizingInformation) {
+          final isMobile =
+              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
+          final isTablet =
+              sizingInformation.deviceScreenType == DeviceScreenType.tablet;
+
+          return Padding(
+            padding: EdgeInsets.all(isMobile ? 12 : (isTablet ? 16 : 24)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'إدارة الفئات',
-                  style: TextStyle(
-                    fontSize: isMobile ? 22 : 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.charcoal,
-                  ),
-                ),
-                const Spacer(),
-                ElevatedButton.icon(
-                  onPressed: controller.fetchAllCategories,
-                  icon: Icon(Icons.refresh, size: isMobile ? 16 : 18),
-                  label: Text(
-                    'تحديث',
-                    style: TextStyle(fontSize: isMobile ? 12 : 14),
-                  ),
-                ),
+                // Header - مضغوط للهاتف
+                _buildHeader(controller, isMobile),
+                SizedBox(height: isMobile ? 12 : 20),
+
+                // Search and Filters
+                // _buildSearchAndFilters(controller, isMobile),
+                // SizedBox(height: isMobile ? 12 : 20),
+
+                // Categories List
+                Expanded(child: _buildCategoriesContent(controller, isMobile)),
               ],
             ),
+          );
+        },
+      ),
+      floatingActionButton: ResponsiveBuilder(
+        builder: (context, sizingInformation) {
+          final isMobile =
+              sizingInformation.deviceScreenType == DeviceScreenType.mobile;
 
-            SizedBox(height: isMobile ? 16 : 24),
+          return FloatingActionButton(
+            onPressed: () => _showAddCategoryDialog(controller),
+            backgroundColor: AppColors.primaryGreen,
+            child: Icon(
+              Icons.add,
+              color: AppColors.white,
+              size: isMobile ? 20 : 24,
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-            // Categories List
-            Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primaryGreen,
-                    ),
-                  );
-                }
-
-                if (controller.categories.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'لا توجد فئات',
-                      style: TextStyle(fontSize: 18, color: AppColors.darkGray),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: controller.categories.length,
-                  itemBuilder: (context, index) {
-                    final category = controller.categories[index];
-                    return _buildCategoryCard(category, controller, isMobile);
-                  },
+  Widget _buildHeader(CategoryController controller, bool isMobile) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              isMobile ? 'الفئات' : 'إدارة الفئات',
+              style: TextStyle(
+                fontSize: isMobile ? 18 : 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.charcoal,
+              ),
+            ),
+            const Spacer(),
+            // إحصائيات صغيرة على الهاتف
+            if (isMobile)
+              Obx(() {
+                return Text(
+                  '${controller.categories.length}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.darkGray,
+                    fontWeight: FontWeight.bold,
+                  ),
                 );
               }),
-            ),
+            if (!isMobile)
+              ElevatedButton.icon(
+                onPressed: controller.fetchAllCategories,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('تحديث'),
+              ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddCategoryDialog(controller),
-        backgroundColor: AppColors.primaryGreen,
-        icon: Icon(Icons.add, color: AppColors.white, size: isMobile ? 18 : 24),
-        label: Text(
-          'إضافة فئة',
-          style: TextStyle(
-            color: AppColors.white,
-            fontSize: isMobile ? 12 : 14,
+        // إحصائيات للشاشات الكبيرة
+        if (!isMobile)
+          Obx(() {
+            final totalCategories = controller.categories.length;
+            final totalSubcategories = controller.categories.fold(
+              0,
+              (sum, category) => sum + (category.subcategories?.length ?? 0),
+            );
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '$totalCategories فئة • $totalSubcategories فئة فرعية',
+                style: const TextStyle(fontSize: 14, color: AppColors.darkGray),
+              ),
+            );
+          }),
+      ],
+    );
+  }
+
+  Widget _buildSearchAndFilters(CategoryController controller, bool isMobile) {
+    return Card(
+      elevation: 1,
+      child: Padding(
+        padding: EdgeInsets.all(isMobile ? 10 : 16),
+        child: TextField(
+          onChanged: (value) {
+            // يمكن إضافة دالة بحث هنا إذا كانت موجودة في الـ Controller
+          },
+          decoration: InputDecoration(
+            hintText: 'ابحث عن فئة...',
+            prefixIcon: const Icon(Icons.search),
+            border: const OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 12 : 16,
+            ),
+            isDense: true,
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildCategoriesContent(CategoryController controller, bool isMobile) {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+        );
+      }
+
+      if (controller.categories.isEmpty) {
+        return const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.category_outlined,
+                size: 64,
+                color: AppColors.darkGray,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'لا توجد فئات',
+                style: TextStyle(fontSize: 16, color: AppColors.darkGray),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'انقر على + لإضافة فئة جديدة',
+                style: TextStyle(fontSize: 14, color: AppColors.darkGray),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.only(bottom: 16),
+        itemCount: controller.categories.length,
+        itemBuilder: (context, index) {
+          final category = controller.categories[index];
+          return _buildCategoryCard(category, controller, isMobile);
+        },
+      );
+    });
   }
 
   Widget _buildCategoryCard(
@@ -98,9 +191,16 @@ class CategoriesView extends StatelessWidget {
     bool isMobile,
   ) {
     return Card(
-      margin: EdgeInsets.only(bottom: isMobile ? 12 : 16),
+      margin: EdgeInsets.only(bottom: isMobile ? 8 : 12),
+      elevation: 1,
       child: ExpansionTile(
+        tilePadding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 12 : 16,
+          vertical: isMobile ? 4 : 8,
+        ),
         leading: Container(
+          width: isMobile ? 36 : 40,
+          height: isMobile ? 36 : 40,
           padding: EdgeInsets.all(isMobile ? 6 : 8),
           decoration: BoxDecoration(
             color: AppColors.veryLightGreen,
@@ -109,7 +209,7 @@ class CategoriesView extends StatelessWidget {
           child: Icon(
             Icons.category,
             color: AppColors.primaryGreen,
-            size: isMobile ? 18 : 24,
+            size: isMobile ? 16 : 20,
           ),
         ),
         title: Text(
@@ -119,14 +219,27 @@ class CategoriesView extends StatelessWidget {
             fontSize: isMobile ? 14 : 16,
           ),
         ),
-        subtitle: Text(
-          'تاريخ الإنشاء: ${DateFormat('dd/MM/yyyy').format(category.createdAt)}',
-          style: TextStyle(
-            color: AppColors.darkGray,
-            fontSize: isMobile ? 12 : 14,
-          ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${category.subcategories?.length ?? 0} فئة فرعية',
+              style: TextStyle(
+                color: AppColors.darkGray,
+                fontSize: isMobile ? 11 : 13,
+              ),
+            ),
+            Text(
+              'أنشئت: ${DateFormat('dd/MM/yyyy').format(category.createdAt)}',
+              style: TextStyle(
+                color: AppColors.darkGray,
+                fontSize: isMobile ? 10 : 12,
+              ),
+            ),
+          ],
         ),
         trailing: PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, size: isMobile ? 18 : 20),
           onSelected: (value) {
             if (value == 'edit') {
               _showEditCategoryDialog(controller, category);
@@ -135,33 +248,23 @@ class CategoriesView extends StatelessWidget {
             }
           },
           itemBuilder: (context) => [
-            PopupMenuItem(
+            const PopupMenuItem(
               value: 'edit',
               child: Row(
                 children: [
-                  Icon(Icons.edit, size: isMobile ? 14 : 16),
-                  SizedBox(width: isMobile ? 6 : 8),
-                  Text('تعديل', style: TextStyle(fontSize: isMobile ? 12 : 14)),
+                  Icon(Icons.edit, size: 16),
+                  SizedBox(width: 8),
+                  Text('تعديل'),
                 ],
               ),
             ),
-            PopupMenuItem(
+            const PopupMenuItem(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(
-                    Icons.delete,
-                    size: isMobile ? 14 : 16,
-                    color: AppColors.error,
-                  ),
-                  SizedBox(width: isMobile ? 6 : 8),
-                  Text(
-                    'حذف',
-                    style: TextStyle(
-                      color: AppColors.error,
-                      fontSize: isMobile ? 12 : 14,
-                    ),
-                  ),
+                  Icon(Icons.delete, size: 16, color: AppColors.error),
+                  SizedBox(width: 8),
+                  Text('حذف', style: TextStyle(color: AppColors.error)),
                 ],
               ),
             ),
@@ -169,19 +272,40 @@ class CategoriesView extends StatelessWidget {
         ),
         children: [
           Padding(
-            padding: EdgeInsets.all(isMobile ? 12 : 16),
+            padding: EdgeInsets.all(isMobile ? 8 : 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'الفئات الفرعية:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.charcoal,
-                    fontSize: isMobile ? 14 : 16,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'الفئات الفرعية',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.charcoal,
+                        fontSize: isMobile ? 13 : 15,
+                      ),
+                    ),
+                    const Spacer(),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          _showAddSubcategoryDialog(controller, category),
+                      icon: Icon(Icons.add, size: isMobile ? 14 : 16),
+                      label: Text(
+                        isMobile ? 'إضافة' : 'إضافة فئة فرعية',
+                        style: TextStyle(fontSize: isMobile ? 11 : 13),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.lightGreen,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 8 : 12,
+                          vertical: isMobile ? 6 : 8,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: isMobile ? 6 : 8),
+                SizedBox(height: isMobile ? 8 : 12),
 
                 if (category.subcategories != null &&
                     category.subcategories!.isNotEmpty)
@@ -193,31 +317,22 @@ class CategoriesView extends StatelessWidget {
                     ),
                   )
                 else
-                  Text(
-                    'لا توجد فئات فرعية',
-                    style: TextStyle(
-                      color: AppColors.darkGray,
-                      fontSize: isMobile ? 12 : 14,
+                  Container(
+                    padding: EdgeInsets.all(isMobile ? 12 : 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGray,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'لا توجد فئات فرعية',
+                        style: TextStyle(
+                          color: AppColors.darkGray,
+                          fontSize: isMobile ? 12 : 14,
+                        ),
+                      ),
                     ),
                   ),
-
-                SizedBox(height: isMobile ? 8 : 12),
-                ElevatedButton.icon(
-                  onPressed: () =>
-                      _showAddSubcategoryDialog(controller, category),
-                  icon: Icon(Icons.add, size: isMobile ? 14 : 16),
-                  label: Text(
-                    'إضافة فئة فرعية',
-                    style: TextStyle(fontSize: isMobile ? 12 : 14),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.lightGreen,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 12 : 16,
-                      vertical: isMobile ? 8 : 12,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -231,99 +346,86 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     bool isMobile,
   ) {
-    return Container(
+    return Card(
       margin: EdgeInsets.symmetric(vertical: isMobile ? 2 : 4),
-      padding: EdgeInsets.all(isMobile ? 8 : 12),
-      decoration: BoxDecoration(
-        color: AppColors.lightGray,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.subdirectory_arrow_right,
-            color: AppColors.primaryGreen,
-            size: isMobile ? 14 : 16,
+      elevation: 0,
+      color: AppColors.lightGray,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 8 : 12,
+          vertical: isMobile ? 4 : 8,
+        ),
+        leading: Icon(
+          Icons.subdirectory_arrow_right,
+          color: AppColors.primaryGreen,
+          size: isMobile ? 16 : 18,
+        ),
+        title: Text(
+          subcategory.name,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: isMobile ? 13 : 14,
           ),
-          SizedBox(width: isMobile ? 6 : 8),
-          Expanded(
-            child: Text(
-              subcategory.name,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: isMobile ? 12 : 14,
+        ),
+        subtitle: Text(
+          DateFormat('dd/MM/yyyy').format(subcategory.createdAt),
+          style: TextStyle(
+            fontSize: isMobile ? 11 : 12,
+            color: AppColors.darkGray,
+          ),
+        ),
+        trailing: PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, size: isMobile ? 16 : 18),
+          onSelected: (value) {
+            if (value == 'edit') {
+              _showEditSubcategoryDialog(controller, subcategory);
+            } else if (value == 'delete') {
+              _showDeleteSubcategoryConfirmation(controller, subcategory);
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'edit',
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 16),
+                  SizedBox(width: 8),
+                  Text('تعديل'),
+                ],
               ),
             ),
-          ),
-          Text(
-            DateFormat('dd/MM/yyyy').format(subcategory.createdAt),
-            style: TextStyle(
-              fontSize: isMobile ? 10 : 12,
-              color: AppColors.darkGray,
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, size: 16, color: AppColors.error),
+                  SizedBox(width: 8),
+                  Text('حذف', style: TextStyle(color: AppColors.error)),
+                ],
+              ),
             ),
-          ),
-          SizedBox(width: isMobile ? 6 : 8),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, size: isMobile ? 14 : 16),
-            onSelected: (value) {
-              if (value == 'edit') {
-                _showEditSubcategoryDialog(controller, subcategory);
-              } else if (value == 'delete') {
-                _showDeleteSubcategoryConfirmation(controller, subcategory);
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, size: isMobile ? 14 : 16),
-                    SizedBox(width: isMobile ? 6 : 8),
-                    Text(
-                      'تعديل',
-                      style: TextStyle(fontSize: isMobile ? 12 : 14),
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.delete,
-                      size: isMobile ? 14 : 16,
-                      color: AppColors.error,
-                    ),
-                    SizedBox(width: isMobile ? 6 : 8),
-                    Text(
-                      'حذف',
-                      style: TextStyle(
-                        color: AppColors.error,
-                        fontSize: isMobile ? 12 : 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   void _showAddCategoryDialog(CategoryController controller) {
-    TextEditingController nameController = TextEditingController();
+    final nameController = TextEditingController();
+    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
 
     Get.dialog(
       AlertDialog(
         title: const Text('إضافة فئة جديدة'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'اسم الفئة',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: isMobile ? 12 : 16,
+            ),
           ),
         ),
         actions: [
@@ -346,18 +448,21 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     Category category,
   ) {
-    TextEditingController nameController = TextEditingController(
-      text: category.name,
-    );
+    final nameController = TextEditingController(text: category.name);
+    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
 
     Get.dialog(
       AlertDialog(
         title: const Text('تعديل الفئة'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'اسم الفئة',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: isMobile ? 12 : 16,
+            ),
           ),
         ),
         actions: [
@@ -383,16 +488,21 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     Category category,
   ) {
-    TextEditingController nameController = TextEditingController();
+    final nameController = TextEditingController();
+    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
 
     Get.dialog(
       AlertDialog(
         title: const Text('إضافة فئة فرعية'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'اسم الفئة الفرعية',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: isMobile ? 12 : 16,
+            ),
           ),
         ),
         actions: [
@@ -414,7 +524,6 @@ class CategoriesView extends StatelessWidget {
     );
   }
 
-  // باقي الدوال بدون تغيير (للحفاظ على التناسق)
   void _showDeleteConfirmation(
     CategoryController controller,
     Category category,
@@ -444,18 +553,21 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     Subcategory subcategory,
   ) {
-    TextEditingController nameController = TextEditingController(
-      text: subcategory.name,
-    );
+    final nameController = TextEditingController(text: subcategory.name);
+    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
 
     Get.dialog(
       AlertDialog(
         title: const Text('تعديل الفئة الفرعية'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'اسم الفئة الفرعية',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: isMobile ? 12 : 16,
+            ),
           ),
         ),
         actions: [

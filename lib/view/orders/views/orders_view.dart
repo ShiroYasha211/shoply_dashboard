@@ -34,15 +34,20 @@ class OrdersView extends StatelessWidget {
 
                     SizedBox(height: isMobile ? 16 : 24),
 
-                    // Stats Cards
-                    _buildStatsCards(controller, sizingInformation),
+                    // // Stats Cards
+                    // _buildStatsCards(controller, sizingInformation),
 
-                    SizedBox(height: isMobile ? 16 : 24),
+                    // SizedBox(height: isMobile ? 16 : 24),
 
-                    // Filters
-                    _buildFilters(controller, sizingInformation),
+                    // // Filters
+                    // _buildFilters(controller, sizingInformation),
 
-                    SizedBox(height: isMobile ? 16 : 24),
+                    // SizedBox(height: isMobile ? 16 : 24),
+                    _buildCollapsibleSection(
+                      controller,
+                      sizingInformation,
+                      isMobile,
+                    ),
 
                     // Orders Table
                     Expanded(child: _buildOrdersTable(controller, isMobile)),
@@ -53,6 +58,114 @@ class OrdersView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCollapsibleSection(
+    OrdersController controller,
+    SizingInformation sizingInfo,
+    bool isMobile,
+  ) {
+    return Obx(
+      () => Column(
+        children: [
+          // زر التحكم في الطي/الفرد
+          _buildCollapseToggle(controller, isMobile),
+
+          // المحتوى (يظهر/يختفي)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: controller.areWidgetsCollapsed.value
+                ? const SizedBox.shrink()
+                : Column(
+                    children: [
+                      SizedBox(height: isMobile ? 16 : 20),
+
+                      // Stats Cards
+                      _buildStatsCards(controller, sizingInfo),
+
+                      SizedBox(height: isMobile ? 16 : 20),
+
+                      // Filters
+                      _buildFilters(controller, sizingInfo),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCollapseToggle(OrdersController controller, bool isMobile) {
+    return Obx(
+      () => Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.lightGray, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ListTile(
+          dense: true,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 12 : 16,
+            vertical: isMobile ? 4 : 8,
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.primaryGreen.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              controller.areWidgetsCollapsed.value
+                  ? Icons.expand_more
+                  : Icons.expand_less,
+              color: AppColors.primaryGreen,
+              size: isMobile ? 18 : 20,
+            ),
+          ),
+          title: Text(
+            controller.areWidgetsCollapsed.value
+                ? 'إظهار الإحصائيات والفلترة'
+                : 'إخفاء الإحصائيات والفلترة',
+            style: TextStyle(
+              fontSize: isMobile ? 14 : 16,
+              fontWeight: FontWeight.w600,
+              color: AppColors.charcoal,
+            ),
+          ),
+          trailing: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: controller.areWidgetsCollapsed.value
+                  ? AppColors.success.withOpacity(0.1)
+                  : AppColors.warning.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              controller.areWidgetsCollapsed.value
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+              size: isMobile ? 16 : 18,
+              color: controller.areWidgetsCollapsed.value
+                  ? AppColors.success
+                  : AppColors.warning,
+            ),
+          ),
+          onTap: () {
+            controller.toggleWidgetsCollapse();
+          },
+        ),
+      ),
     );
   }
 
