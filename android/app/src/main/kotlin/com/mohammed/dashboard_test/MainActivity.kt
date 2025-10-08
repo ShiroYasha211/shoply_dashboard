@@ -1,0 +1,5 @@
+package com.mohammed.dashboard_test
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
