@@ -103,7 +103,7 @@ class NotificationsView extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(Icons.add_circle_outline, color: AppColors.primaryGreen),
+                Icon(Icons.add_circle_outline, color: AppColors.primaryBrown),
                 SizedBox(width: 8),
                 Text(
                   'إرسال إشعار جديد',
@@ -186,11 +186,11 @@ class NotificationsView extends StatelessWidget {
       onPressed: () => controller.setNotificationType(type),
       style: OutlinedButton.styleFrom(
         backgroundColor: isSelected
-            ? AppColors.primaryGreen.withOpacity(0.1)
+            ? AppColors.primaryBrown.withOpacity(0.1)
             : null,
         side: BorderSide(
           color: isSelected
-              ? AppColors.primaryGreen
+              ? AppColors.primaryBrown
               : AppColors.darkGray.withOpacity(0.3),
           width: isSelected ? 2 : 1,
         ),
@@ -202,13 +202,13 @@ class NotificationsView extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: isSelected ? AppColors.primaryGreen : AppColors.darkGray,
+            color: isSelected ? AppColors.primaryBrown : AppColors.darkGray,
           ),
           const SizedBox(width: 8),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? AppColors.primaryGreen : AppColors.darkGray,
+              color: isSelected ? AppColors.primaryBrown : AppColors.darkGray,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -308,7 +308,7 @@ class NotificationsView extends StatelessWidget {
                         : 'إرسال للمستخدم',
                   ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
+              backgroundColor: AppColors.primaryBrown,
             ),
           ),
         ),
@@ -372,7 +372,7 @@ class NotificationsView extends StatelessWidget {
                             : 'إرسال للمستخدم',
                       ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
+                  backgroundColor: AppColors.primaryBrown,
                 ),
               ),
             ),
@@ -420,7 +420,7 @@ class NotificationsView extends StatelessWidget {
           children: [
             const Icon(
               Icons.filter_list,
-              color: AppColors.primaryGreen,
+              color: AppColors.primaryBrown,
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -471,7 +471,7 @@ class NotificationsView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: AppColors.primaryGreen),
+            CircularProgressIndicator(color: AppColors.primaryBrown),
             SizedBox(height: 16),
             Text('جاري تحميل الإشعارات...'),
           ],
@@ -504,7 +504,7 @@ class NotificationsView extends StatelessWidget {
 
       return RefreshIndicator(
         onRefresh: () => controller.loadNotifications(),
-        color: AppColors.primaryGreen,
+        color: AppColors.primaryBrown,
         child: ListView.builder(
           itemCount: notifications.length,
           itemBuilder: (context, index) {
@@ -536,7 +536,7 @@ class NotificationsView extends StatelessWidget {
                       notification.isGeneral ? Icons.campaign : Icons.person,
                       color: notification.isRead
                           ? AppColors.darkGray
-                          : AppColors.primaryGreen,
+                          : AppColors.primaryBrown,
                       size: 24,
                     ),
                     if (!notification.isRead)
@@ -578,7 +578,7 @@ class NotificationsView extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: notification.isGeneral
                               ? AppColors.info.withOpacity(0.1)
-                              : AppColors.primaryGreen.withOpacity(0.1),
+                              : AppColors.primaryBrown.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -587,7 +587,7 @@ class NotificationsView extends StatelessWidget {
                             fontSize: 11,
                             color: notification.isGeneral
                                 ? AppColors.info
-                                : AppColors.primaryGreen,
+                                : AppColors.primaryBrown,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -667,7 +667,7 @@ class NotificationsView extends StatelessWidget {
                     const Icon(
                       Icons.person,
                       size: 16,
-                      color: AppColors.primaryGreen,
+                      color: AppColors.primaryBrown,
                     ),
                     const SizedBox(width: 8),
                     Text(

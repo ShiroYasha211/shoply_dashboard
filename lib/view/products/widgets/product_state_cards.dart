@@ -38,7 +38,7 @@ class ProductStateCards extends StatelessWidget {
               title: 'الإجمالي',
               value: stats['total']?.toString() ?? '0',
               icon: Icons.inventory_2,
-              color: AppColors.primaryGreen,
+              color: AppColors.primaryBrown,
               isMobile: isMobile,
             ),
             const SizedBox(width: 8),
@@ -84,7 +84,7 @@ class ProductStateCards extends StatelessWidget {
           title: 'الإجمالي',
           value: stats['total']?.toString() ?? '0',
           icon: Icons.inventory_2,
-          color: AppColors.primaryGreen,
+          color: AppColors.primaryBrown,
           isMobile: isMobile,
         ),
         _buildStatCard(

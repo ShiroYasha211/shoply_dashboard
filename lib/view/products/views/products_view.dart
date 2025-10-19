@@ -69,7 +69,7 @@ class ProductsView extends StatelessWidget {
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _showAddProductDialog(controller),
-            backgroundColor: AppColors.primaryGreen,
+            backgroundColor: AppColors.primaryBrown,
             icon: const Icon(Icons.add, color: AppColors.white, size: 24),
             label: const Text(
               'إضافة منتج',
@@ -137,7 +137,7 @@ class ProductsView extends StatelessWidget {
             controller.areWidgetsCollapsed.value
                 ? Icons.expand_more
                 : Icons.expand_less,
-            color: AppColors.primaryGreen,
+            color: AppColors.primaryBrown,
             size: 20,
           ),
           title: Text(
@@ -271,7 +271,7 @@ class ProductsView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
-                  color: AppColors.primaryGreen,
+                  color: AppColors.primaryBrown,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
@@ -355,11 +355,11 @@ class ProductsView extends StatelessWidget {
                         onPressed: () => Get.back(),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: AppColors.primaryGreen),
+                          side: const BorderSide(color: AppColors.primaryBrown),
                         ),
                         child: const Text(
                           'إلغاء',
-                          style: TextStyle(color: AppColors.primaryGreen),
+                          style: TextStyle(color: AppColors.primaryBrown),
                         ),
                       ),
                     ),
@@ -411,7 +411,7 @@ class ProductsView extends StatelessWidget {
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
+                            backgroundColor: AppColors.primaryBrown,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           child: controller.isLoading.value

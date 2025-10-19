@@ -49,7 +49,7 @@ class CategoriesView extends StatelessWidget {
 
           return FloatingActionButton(
             onPressed: () => _showAddCategoryDialog(controller),
-            backgroundColor: AppColors.primaryGreen,
+            backgroundColor: AppColors.primaryBrown,
             child: Icon(
               Icons.add,
               color: AppColors.white,
@@ -145,7 +145,7 @@ class CategoriesView extends StatelessWidget {
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          child: CircularProgressIndicator(color: AppColors.primaryBrown),
         );
       }
 
@@ -203,12 +203,12 @@ class CategoriesView extends StatelessWidget {
           height: isMobile ? 36 : 40,
           padding: EdgeInsets.all(isMobile ? 6 : 8),
           decoration: BoxDecoration(
-            color: AppColors.veryLightGreen,
+            color: AppColors.lightGray,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             Icons.category,
-            color: AppColors.primaryGreen,
+            color: AppColors.primaryBrown,
             size: isMobile ? 16 : 20,
           ),
         ),
@@ -296,7 +296,7 @@ class CategoriesView extends StatelessWidget {
                         style: TextStyle(fontSize: isMobile ? 11 : 13),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.lightGreen,
+                        backgroundColor: AppColors.accentGold,
                         padding: EdgeInsets.symmetric(
                           horizontal: isMobile ? 8 : 12,
                           vertical: isMobile ? 6 : 8,
@@ -357,7 +357,7 @@ class CategoriesView extends StatelessWidget {
         ),
         leading: Icon(
           Icons.subdirectory_arrow_right,
-          color: AppColors.primaryGreen,
+          color: AppColors.primaryBrown,
           size: isMobile ? 16 : 18,
         ),
         title: Text(

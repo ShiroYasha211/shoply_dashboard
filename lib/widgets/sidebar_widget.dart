@@ -13,7 +13,7 @@ class SidebarWidget extends StatelessWidget {
       builder: (controller) {
         return Container(
           decoration: const BoxDecoration(
-            color: AppColors.sidebarBackground,
+            color: AppColors.primaryBrown,
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
@@ -51,25 +51,21 @@ class SidebarWidget extends StatelessWidget {
                 ? MainAxisAlignment.center
                 : MainAxisAlignment.start,
             children: [
-              Container(
-                width: controller.isCollapsed ? 32 : 33,
-                height: controller.isCollapsed ? 32 : 40,
+              SizedBox(
+                width: controller.isCollapsed ? 45 : 48,
+                height: controller.isCollapsed ? 47 : 55,
 
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  FontAwesomeIcons.shop,
-                  color: AppColors.primaryGreen,
-                  size: controller.isCollapsed ? 16 : 20,
+                child: Image.asset(
+                  "assets/icons/small_logo.png",
+                  fit: BoxFit.cover,
+                  height: controller.isCollapsed ? 100 : 200,
                 ),
               ),
               if (!controller.isCollapsed) ...[
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
-                    'Shoply Admin',
+                    'Asaloz Admin',
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: 18,
@@ -92,9 +88,9 @@ class SidebarWidget extends StatelessWidget {
       _MenuItem(Icons.inventory_2_outlined, 'المنتجات', 2),
       _MenuItem(Icons.category_outlined, 'الفئات', 3),
       _MenuItem(Icons.shopping_cart_outlined, 'الطلبات', 4),
-      // _MenuItem(Icons.star_outline, 'التقييمات', 5),
-      //_MenuItem(Icons.notifications_outlined, 'الإشعارات', 6),
-      // _MenuItem(Icons.settings_outlined, 'الإعدادات', 7),
+      _MenuItem(Icons.star_outline, 'التقييمات', 5),
+      _MenuItem(Icons.notifications_outlined, 'الإشعارات', 6),
+      _MenuItem(Icons.settings_outlined, 'الإعدادات', 7),
     ];
 
     return SingleChildScrollView(

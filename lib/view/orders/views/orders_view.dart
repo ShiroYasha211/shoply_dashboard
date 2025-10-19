@@ -122,14 +122,14 @@ class OrdersView extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryBrown.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               controller.areWidgetsCollapsed.value
                   ? Icons.expand_more
                   : Icons.expand_less,
-              color: AppColors.primaryGreen,
+              color: AppColors.primaryBrown,
               size: isMobile ? 18 : 20,
             ),
           ),
@@ -206,7 +206,7 @@ class OrdersView extends StatelessWidget {
                 child: _buildStatCard(
                   'إجمالي الطلبات',
                   controller.totalOrders.toString(),
-                  AppColors.primaryGreen,
+                  AppColors.primaryBrown,
                   isMobile: isMobile,
                 ),
               ),
@@ -271,7 +271,7 @@ class OrdersView extends StatelessWidget {
                 child: _buildStatCard(
                   'إجمالي الطلبات',
                   controller.totalOrders.toString(),
-                  AppColors.primaryGreen,
+                  AppColors.primaryBrown,
                   isMobile: isMobile,
                 ),
               ),
@@ -329,7 +329,7 @@ class OrdersView extends StatelessWidget {
           child: _buildStatCard(
             'إجمالي الطلبات',
             controller.totalOrders.toString(),
-            AppColors.primaryGreen,
+            AppColors.primaryBrown,
             isMobile: isMobile,
           ),
         ),
@@ -420,7 +420,7 @@ class OrdersView extends StatelessWidget {
               style: TextStyle(
                 fontSize: isMobile ? 14 : 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryGreen,
+                color: AppColors.primaryBrown,
               ),
             ),
             SizedBox(height: isMobile ? 2 : 4),
@@ -517,7 +517,7 @@ class OrdersView extends StatelessWidget {
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          child: CircularProgressIndicator(color: AppColors.primaryBrown),
         );
       }
 
@@ -626,7 +626,7 @@ class OrdersView extends StatelessWidget {
                     'ر.ي ${order.totalPrice.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryGreen,
+                      color: AppColors.primaryBrown,
                       fontSize: isMobile ? 12 : 14,
                     ),
                   ),
@@ -686,7 +686,7 @@ class OrdersView extends StatelessWidget {
           onPressed: () => _showOrderDetails(order),
           icon: Icon(Icons.visibility, size: isMobile ? 18 : 20),
           tooltip: 'عرض التفاصيل',
-          color: AppColors.primaryGreen,
+          color: AppColors.primaryBrown,
         ),
 
         // قائمة تغيير الحالة (تظهر فقط إذا كان هناك خيارات متاحة)
@@ -925,7 +925,7 @@ class OrdersView extends StatelessWidget {
                         child: Padding(
                           padding: EdgeInsets.all(32.0),
                           child: CircularProgressIndicator(
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBrown,
                           ),
                         ),
                       ),
@@ -1255,7 +1255,7 @@ class OrdersView extends StatelessWidget {
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: AppColors
-                                                        .primaryGreen
+                                                        .primaryBrown
                                                         .withOpacity(0.1),
                                                     borderRadius:
                                                         BorderRadius.circular(
@@ -1268,7 +1268,7 @@ class OrdersView extends StatelessWidget {
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: AppColors
-                                                          .primaryGreen,
+                                                          .primaryBrown,
                                                       fontSize: isMobile
                                                           ? 11
                                                           : 13,
@@ -1285,7 +1285,7 @@ class OrdersView extends StatelessWidget {
                                               'ر.ي ${item.totalPrice.toStringAsFixed(2)}',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                color: AppColors.primaryGreen,
+                                                color: AppColors.primaryBrown,
                                                 fontSize: isMobile ? 12 : 14,
                                               ),
                                             ),
@@ -1303,7 +1303,7 @@ class OrdersView extends StatelessWidget {
                                   ),
                                   padding: EdgeInsets.all(isMobile ? 12 : 16),
                                   decoration: BoxDecoration(
-                                    color: AppColors.veryLightGreen,
+                                    color: AppColors.lightGray,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
@@ -1450,7 +1450,7 @@ class OrdersView extends StatelessWidget {
           style: TextStyle(
             fontSize: isTotal ? (isMobile ? 16 : 18) : (isMobile ? 12 : 14),
             fontWeight: FontWeight.bold,
-            color: isTotal ? AppColors.primaryGreen : AppColors.charcoal,
+            color: isTotal ? AppColors.primaryBrown : AppColors.charcoal,
           ),
         ),
       ],

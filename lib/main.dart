@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Shoply Dashboard',
+      title: 'Asaloz Dashboard',
       theme: AppTheme.lightTheme,
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,

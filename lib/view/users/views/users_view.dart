@@ -222,7 +222,7 @@ class UsersView extends StatelessWidget {
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryGreen),
+          child: CircularProgressIndicator(color: AppColors.primaryBrown),
         );
       }
 
@@ -230,23 +230,19 @@ class UsersView extends StatelessWidget {
 
       if (users.isEmpty) {
         return const Center(
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.people_outline,
-                size: 64,
-                color: AppColors.darkGray,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'لا توجد مستخدمين',
+              Icon(Icons.people_outline, size: 64, color: AppColors.darkGray),
+              SizedBox(height: 16),
+              Text(
+                'لا يوجد مستخدمين',
                 style: const TextStyle(fontSize: 16, color: AppColors.darkGray),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: 8),
+              Text(
                 'جرب تغيير عوامل التصفية',
-                style: const TextStyle(fontSize: 14, color: AppColors.darkGray),
+                style: TextStyle(fontSize: 14, color: AppColors.darkGray),
               ),
             ],
           ),
@@ -278,14 +274,14 @@ class UsersView extends StatelessWidget {
             ),
             leading: CircleAvatar(
               radius: 20,
-              backgroundColor: AppColors.veryLightGreen,
+              backgroundColor: AppColors.lightGray,
               backgroundImage: user.avatarUrl != null
                   ? NetworkImage(user.avatarUrl!)
                   : null,
               child: user.avatarUrl == null
                   ? const Icon(
                       Icons.person,
-                      color: AppColors.primaryGreen,
+                      color: AppColors.primaryBrown,
                       size: 18,
                     )
                   : null,
@@ -358,17 +354,18 @@ class UsersView extends StatelessWidget {
               ],
             ),
             trailing: PopupMenuButton<String>(
+              color: AppColors.lightGray,
               icon: const Icon(Icons.more_vert, size: 18),
               onSelected: (value) =>
                   _handleMobileUserAction(value, user, controller),
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'change_role',
-                  child: const Row(
+                  child: Row(
                     children: [
-                      const Icon(Icons.admin_panel_settings, size: 16),
-                      const SizedBox(width: 8),
-                      const Text('تغيير الدور'),
+                      Icon(Icons.admin_panel_settings, size: 16),
+                      SizedBox(width: 8),
+                      Text('تغيير الدور'),
                     ],
                   ),
                 ),
@@ -390,11 +387,11 @@ class UsersView extends StatelessWidget {
                 ),
                 const PopupMenuItem(
                   value: 'view_details',
-                  child: const Row(
+                  child: Row(
                     children: [
-                      const Icon(Icons.info_outline, size: 16),
-                      const SizedBox(width: 8),
-                      const Text('عرض التفاصيل'),
+                      Icon(Icons.info_outline, size: 16),
+                      SizedBox(width: 8),
+                      Text('عرض التفاصيل'),
                     ],
                   ),
                 ),
@@ -454,14 +451,14 @@ class UsersView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: AppColors.veryLightGreen,
+                      backgroundColor: AppColors.lightGray,
                       backgroundImage: user.avatarUrl != null
                           ? NetworkImage(user.avatarUrl!)
                           : null,
                       child: user.avatarUrl == null
                           ? const Icon(
                               Icons.person,
-                              color: AppColors.primaryGreen,
+                              color: AppColors.primaryBrown,
                               size: 16,
                             )
                           : null,
@@ -487,7 +484,7 @@ class UsersView extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: user.role == 'admin'
-                        ? AppColors.primaryGreen.withOpacity(0.1)
+                        ? AppColors.primaryBrown.withOpacity(0.1)
                         : AppColors.info.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -496,7 +493,7 @@ class UsersView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: user.role == 'admin'
-                          ? AppColors.primaryGreen
+                          ? AppColors.primaryBrown
                           : AppColors.info,
                       fontWeight: FontWeight.w500,
                     ),
@@ -537,7 +534,7 @@ class UsersView extends StatelessWidget {
                         Icons.admin_panel_settings,
                         color: user.role == 'admin'
                             ? AppColors.warning
-                            : AppColors.primaryGreen,
+                            : AppColors.primaryBrown,
                         size: 20,
                       ),
                       onPressed: () => _showChangeRoleDialog(controller, user),
@@ -556,6 +553,7 @@ class UsersView extends StatelessWidget {
                       tooltip: user.status == 'active' ? 'حظر' : 'فك الحظر',
                     ),
                     PopupMenuButton<String>(
+                      color: AppColors.lightGray,
                       onSelected: (value) {
                         if (value == 'view_details') {
                           _showUserDetails(controller, user);
@@ -589,28 +587,317 @@ class UsersView extends StatelessWidget {
     );
   }
 
-  // باقي الدوال تبقى كما هي بدون تغيير
   void _showChangeRoleDialog(ProfileController controller, Profile user) {
     final newRole = user.role == 'admin' ? 'customer' : 'admin';
     final roleText = newRole == 'admin' ? 'مدير' : 'عميل';
+    final currentRoleText = user.role == 'admin' ? 'مدير' : 'عميل';
+    final icon = newRole == 'admin' ? Icons.admin_panel_settings : Icons.person;
+    final color = newRole == 'admin' ? Colors.orange : Colors.blue;
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('تغيير دور المستخدم'),
-        content: Text(
-          'هل تريد تغيير دور ${user.fullName ?? user.email} إلى $roleText؟',
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              controller.updateUserRole(user.id, newRole);
-              Get.back();
-            },
-            child: const Text('تأكيد'),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 340,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with icon
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Icon
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, size: 30, color: color),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      'تغيير الدور',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    // User info
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.grey.shade200,
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user.fullName ?? user.email,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  user.email,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Role change visualization
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        // Current role
+                        Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                user.role == 'admin'
+                                    ? Icons.admin_panel_settings
+                                    : Icons.person,
+                                size: 24,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              currentRoleText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              'الدور الحالي',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Arrow
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.grey.shade400,
+                              size: 24,
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+
+                        // New role
+                        Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(icon, size: 24, color: color),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              roleText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: color,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              'الدور الجديد',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Warning message
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.orange.shade600,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'سيتم تغيير صلاحيات المستخدم فور التأكيد',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.orange.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Buttons
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.grey.shade700,
+                          side: BorderSide(color: Colors.grey.shade300),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'إلغاء',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Confirm Button
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          controller.updateUserRole(user.id, newRole);
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'تأكيد التغيير',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.swap_horiz_rounded, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -618,89 +905,707 @@ class UsersView extends StatelessWidget {
     final newStatus = user.status == 'active' ? 'banned' : 'active';
     final actionText = newStatus == 'banned' ? 'حظر' : 'فك الحظر';
     final statusText = newStatus == 'banned' ? 'محظور' : 'نشط';
+    final icon = newStatus == 'banned'
+        ? Icons.block_rounded
+        : Icons.check_circle_rounded;
+    final color = newStatus == 'banned' ? Colors.red : Colors.green;
+    final currentStatusText = user.status == 'active' ? 'نشط' : 'محظور';
 
     Get.dialog(
-      AlertDialog(
-        title: Text('$actionText المستخدم'),
-        content: Text(
-          'هل تريد $actionText المستخدم ${user.fullName ?? user.email}؟'
-          ' سيكون حالة الحساب: $statusText',
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              if (newStatus == 'banned') {
-                controller.banUser(user.id);
-              } else {
-                controller.unbanUser(user.id);
-              }
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: newStatus == 'banned'
-                  ? AppColors.error
-                  : AppColors.success,
-            ),
-            child: Text(actionText),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 360,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  void _showUserDetails(ProfileController controller, Profile user) {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('تفاصيل المستخدم'),
-        content: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildUserDetailItem('الاسم الكامل', user.fullName ?? 'غير محدد'),
-              _buildUserDetailItem('البريد الإلكتروني', user.email),
-              _buildUserDetailItem('الهاتف', user.phone ?? 'غير محدد'),
-              _buildUserDetailItem('العنوان', user.address ?? 'غير محدد'),
-              _buildUserDetailItem(
-                'الدور',
-                user.role == 'admin' ? 'مدير' : 'عميل',
+              // Header with icon
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Icon
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, size: 35, color: color),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      actionText == 'حظر' ? 'حظر المستخدم' : 'فك حظر المستخدم',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              _buildUserDetailItem(
-                'الحالة',
-                user.status == 'active' ? 'نشط' : 'محظور',
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    // User info
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: user.status == 'active'
+                                  ? Colors.green.withOpacity(0.2)
+                                  : Colors.red.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              user.status == 'active'
+                                  ? Icons.person_rounded
+                                  : Icons.block_rounded,
+                              color: user.status == 'active'
+                                  ? Colors.green
+                                  : Colors.red,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user.fullName ?? user.email,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  user.email,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: user.status == 'active'
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: user.status == 'active'
+                                    ? Colors.green.withOpacity(0.3)
+                                    : Colors.red.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Text(
+                              currentStatusText,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: user.status == 'active'
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Status change visualization
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: color.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: color,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  actionText == 'حظر'
+                                      ? 'سيتم حظر هذا المستخدم'
+                                      : 'سيتم فك حظر هذا المستخدم',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: color,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  actionText == 'حظر'
+                                      ? 'لن يتمكن من تسجيل الدخول أو استخدام الخدمة حتى يتم فك الحظر'
+                                      : 'سيتمكن من تسجيل الدخول واستخدام الخدمة بشكل طبيعي',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.grey.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Status change arrow
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            currentStatusText,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_rounded,
+                            color: color,
+                            size: 20,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: color.withOpacity(0.3)),
+                          ),
+                          child: Text(
+                            statusText,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              _buildUserDetailItem(
-                'تاريخ التسجيل',
-                DateFormat('dd/MM/yyyy - HH:mm').format(user.createdAt),
+
+              // Buttons
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.grey.shade700,
+                          side: BorderSide(color: Colors.grey.shade300),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'إلغاء',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Action Button
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (newStatus == 'banned') {
+                            controller.banUser(user.id);
+                          } else {
+                            controller.unbanUser(user.id);
+                          }
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: color,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              actionText == 'حظر'
+                                  ? Icons.block_rounded
+                                  : Icons.lock_open_rounded,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              actionText,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إغلاق')),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  void _showUserDetails(ProfileController controller, Profile user) {
+    final roleText = user.role == 'admin' ? 'مدير' : 'عميل';
+    final statusText = user.status == 'active' ? 'نشط' : 'محظور';
+    final statusColor = user.status == 'active' ? Colors.green : Colors.red;
+    final roleColor = user.role == 'admin' ? Colors.orange : Colors.blue;
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 450,
+          constraints: const BoxConstraints(maxHeight: 600),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // User Avatar
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: roleColor.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        user.role == 'admin'
+                            ? Icons.admin_panel_settings_rounded
+                            : Icons.person_rounded,
+                        size: 30,
+                        color: roleColor,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+
+                    // User Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.fullName ?? 'بدون اسم',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.charcoal,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            user.email,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Status Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: statusColor.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: statusColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            statusText,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: statusColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      // Personal Information Section
+                      _buildSectionHeader(
+                        icon: Icons.person_outline_rounded,
+                        title: 'المعلومات الشخصية',
+                      ),
+                      _buildUserDetailCard(
+                        items: [
+                          _buildDetailItemWithIcon(
+                            icon: Icons.person_rounded,
+                            label: 'الاسم الكامل',
+                            value: user.fullName ?? 'غير محدد',
+                            iconColor: Colors.blue,
+                          ),
+                          _buildDetailItemWithIcon(
+                            icon: Icons.phone_rounded,
+                            label: 'رقم الهاتف',
+                            value: user.phone ?? 'غير محدد',
+                            iconColor: Colors.green,
+                          ),
+                          _buildDetailItemWithIcon(
+                            icon: Icons.location_on_rounded,
+                            label: 'العنوان',
+                            value: user.address ?? 'غير محدد',
+                            iconColor: Colors.orange,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Account Information Section
+                      _buildSectionHeader(
+                        icon: Icons.account_circle_rounded,
+                        title: 'معلومات الحساب',
+                      ),
+                      _buildUserDetailCard(
+                        items: [
+                          _buildDetailItemWithIcon(
+                            icon: Icons.email_rounded,
+                            label: 'البريد الإلكتروني',
+                            value: user.email,
+                            iconColor: Colors.purple,
+                          ),
+                          _buildDetailItemWithIcon(
+                            icon: Icons.workspace_premium_rounded,
+                            label: 'الدور',
+                            value: roleText,
+                            iconColor: roleColor,
+                            valueColor: roleColor,
+                          ),
+                          _buildDetailItemWithIcon(
+                            icon: Icons.calendar_today_rounded,
+                            label: 'تاريخ التسجيل',
+                            value: DateFormat(
+                              'dd/MM/yyyy - HH:mm',
+                            ).format(user.createdAt),
+                            iconColor: Colors.teal,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // User ID
+                    // Text(
+                    //   'ID: ${user.id}',
+                    //   style: TextStyle(
+                    //     fontSize: 8,
+                    //     color: Colors.grey.shade500,
+                    //     fontFamily: 'monospace',
+                    //   ),
+                    // ),
+
+                    // Close Button
+                    SizedBox(
+                      width: 120,
+                      child: ElevatedButton(
+                        onPressed: () => Get.back(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.charcoal,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'إغلاق',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(Icons.close_rounded, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  Widget _buildSectionHeader({required IconData icon, required String title}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: AppColors.charcoal),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.charcoal,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildUserDetailItem(String label, String value) {
+  Widget _buildUserDetailCard({required List<Widget> items}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(children: items),
+    );
+  }
+
+  Widget _buildDetailItemWithIcon({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color iconColor,
+    Color? valueColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$label: ',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.charcoal,
+          // Icon
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
+            child: Icon(icon, size: 18, color: iconColor),
           ),
+          const SizedBox(width: 12),
+
+          // Content
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: AppColors.darkGray),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: valueColor ?? AppColors.charcoal,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],

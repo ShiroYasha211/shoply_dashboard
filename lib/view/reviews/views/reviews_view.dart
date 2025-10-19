@@ -38,52 +38,60 @@ class ReviewsView extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Filter
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: SizedBox(
                       width: 200,
-                      child: Obx(() => DropdownButtonFormField<String>(
-                        value: controller.selectedRating,
-                        decoration: const InputDecoration(
-                          labelText: 'تصفية حسب التقييم',
-                          border: OutlineInputBorder(),
+                      child: Obx(
+                        () => DropdownButtonFormField<String>(
+                          value: controller.selectedRating,
+                          decoration: const InputDecoration(
+                            labelText: 'تصفية حسب التقييم',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'all',
+                              child: Text('جميع التقييمات'),
+                            ),
+                            DropdownMenuItem(value: '5', child: Text('5 نجوم')),
+                            DropdownMenuItem(value: '4', child: Text('4 نجوم')),
+                            DropdownMenuItem(value: '3', child: Text('3 نجوم')),
+                            DropdownMenuItem(value: '2', child: Text('نجمتان')),
+                            DropdownMenuItem(
+                              value: '1',
+                              child: Text('نجمة واحدة'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.setSelectedRating(value);
+                            }
+                          },
                         ),
-                        items: const [
-                          DropdownMenuItem(value: 'all', child: Text('جميع التقييمات')),
-                          DropdownMenuItem(value: '5', child: Text('5 نجوم')),
-                          DropdownMenuItem(value: '4', child: Text('4 نجوم')),
-                          DropdownMenuItem(value: '3', child: Text('3 نجوم')),
-                          DropdownMenuItem(value: '2', child: Text('نجمتان')),
-                          DropdownMenuItem(value: '1', child: Text('نجمة واحدة')),
-                        ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            controller.setSelectedRating(value);
-                          }
-                        },
-                      )),
+                      ),
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Reviews List
                 Expanded(
                   child: controller.isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBrown,
                           ),
                         )
                       : Obx(() {
                           final reviews = controller.filteredReviews;
-                          
+
                           if (reviews.isEmpty) {
                             return const Center(
                               child: Text(
@@ -95,7 +103,7 @@ class ReviewsView extends StatelessWidget {
                               ),
                             );
                           }
-                          
+
                           return ListView.builder(
                             itemCount: reviews.length,
                             itemBuilder: (context, index) {
@@ -126,10 +134,10 @@ class ReviewsView extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundColor: AppColors.veryLightGreen,
+                  backgroundColor: AppColors.lightGray,
                   child: const Icon(
                     Icons.person,
-                    color: AppColors.primaryGreen,
+                    color: AppColors.primaryBrown,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -205,28 +213,22 @@ class ReviewsView extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Comment
             if (review.comment != null && review.comment!.isNotEmpty)
               Text(
                 review.comment!,
-                style: const TextStyle(
-                  fontSize: 14,
-                  height: 1.5,
-                ),
+                style: const TextStyle(fontSize: 14, height: 1.5),
               ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Date
             Text(
               DateFormat('dd/MM/yyyy HH:mm').format(review.createdAt),
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppColors.darkGray,
-              ),
+              style: const TextStyle(fontSize: 12, color: AppColors.darkGray),
             ),
           ],
         ),
@@ -248,20 +250,17 @@ class ReviewsView extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text('حذف تقييم'),
-        content: const Text('هل تريد حذف هلا التقييم؟ هذا الإجراء لا يمكن التراجع عنه.'),
+        content: const Text(
+          'هل تريد حذف هلا التقييم؟ هذا الإجراء لا يمكن التراجع عنه.',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('إلغاء'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
           ElevatedButton(
             onPressed: () {
               controller.deleteReview(review.id);
               Get.back();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text('حذف'),
           ),
         ],

@@ -27,28 +27,16 @@ class LoginPage extends GetView<LoginController> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Logo and Title
-                      Icon(
-                        FontAwesomeIcons.userShield,
-                        size: 64,
-                        color: Get.theme.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Shoply',
-                        style: Get.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Get.theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      Image.asset('assets/icons/main_logo.png', height: 250),
+
+                      const SizedBox(height: 2),
                       Text(
                         'لوحة تحكم المدراء',
                         style: Get.textTheme.bodyLarge?.copyWith(
                           color: Get.theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 20),
 
                       // Email Field
                       TextFormField(
@@ -58,7 +46,7 @@ class LoginPage extends GetView<LoginController> {
                         validator: controller.validateEmail,
                         decoration: InputDecoration(
                           labelText: 'البريد الإلكتروني',
-                          hintText: 'admin@shoply.com',
+                          hintText: 'admin@Asaloz.com',
                           prefixIcon: const Icon(FontAwesomeIcons.envelope),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),

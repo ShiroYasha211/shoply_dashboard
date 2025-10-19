@@ -48,7 +48,7 @@ Widget _buildHeader(
             Icon(
               Icons.inventory_2_outlined,
               size: isMobile ? 20 : 24,
-              color: AppColors.primaryGreen,
+              color: AppColors.primaryBrown,
             ),
             SizedBox(width: isMobile ? 8 : 12),
             Text(
@@ -133,7 +133,7 @@ Widget _buildToggleButton({
   return Container(
     decoration: BoxDecoration(
       color: isActive
-          ? AppColors.primaryGreen.withOpacity(0.1)
+          ? AppColors.primaryBrown.withOpacity(0.1)
           : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
     ),
@@ -142,7 +142,7 @@ Widget _buildToggleButton({
       icon: Icon(
         icon,
         size: isMobile ? 18 : 20,
-        color: isActive ? AppColors.primaryGreen : AppColors.darkGray,
+        color: isActive ? AppColors.primaryBrown : AppColors.darkGray,
       ),
       tooltip: tooltip,
       padding: EdgeInsets.all(isMobile ? 6 : 8),
@@ -182,7 +182,7 @@ Widget _buildRefreshButton(
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.primaryBrown,
         foregroundColor: Colors.white,
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 12 : 16,

@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Green Palette - Soft and Calm
-  static const Color primaryGreen = Color(0xFF2E7D32);
-  static const Color lightGreen = Color(0xFF4CAF50);
-  static const Color softGreen = Color(0xFF66BB6A);
-  static const Color paleGreen = Color(0xFFA5D6A7);
-  static const Color veryLightGreen = Color(0xFFE8F5E8);
-
-  // Accent Colors
-  static const Color accentGreen = Color(0xFF388E3C);
-  static const Color darkGreen = Color(0xFF1B5E20);
+  // Primary Brown/Gold Palette - Based on Client Preferences
+  static const Color primaryBrown = Color(0xFF403828);
+  static const Color accentGold = Color(0xFFE8B848);
+  static const Color darkGold = Color(0xFFA07010);
+  static const Color brightGold = Color(0xFFF8B008);
+  static const Color lightGold = Color(0xFFF8D078);
 
   // Neutral Colors
   static const Color white = Color(0xFFFFFFFF);
@@ -28,7 +24,6 @@ class AppColors {
   // Background Colors
   static const Color scaffoldBackground = Color(0xFFFAFAFA);
   static const Color cardBackground = Color(0xFFFFFFFF);
-  static const Color sidebarBackground = Color(0xFF2E7D32);
 }
 
 class AppTheme {
@@ -36,29 +31,38 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: 'TheSansArabic',
-      primarySwatch: createMaterialColor(AppColors.primaryGreen),
-      primaryColor: AppColors.primaryGreen,
+      primarySwatch: createMaterialColor(AppColors.primaryBrown),
+      primaryColor: AppColors.primaryBrown,
       scaffoldBackgroundColor: AppColors.scaffoldBackground,
+
+      // Color Scheme for Material 3
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBrown,
+        primary: AppColors.primaryBrown,
+        secondary: AppColors.accentGold,
+        background: AppColors.scaffoldBackground,
+        surface: AppColors.white,
+      ),
 
       // AppBar Theme
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.charcoal,
-        elevation: 0,
+        backgroundColor: AppColors.primaryBrown, // استخدام Swatch 1
+        foregroundColor: AppColors.white,
+        elevation: 2,
         centerTitle: false,
         titleTextStyle: TextStyle(
           fontFamily: 'TheSansArabic',
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.charcoal,
+          color: AppColors.white,
         ),
       ),
 
       // Card Theme
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
-        elevation: 2,
-        shadowColor: AppColors.primaryGreen.withOpacity(0.1),
+        elevation: 3,
+        shadowColor: AppColors.primaryBrown.withOpacity(0.2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
@@ -67,17 +71,17 @@ class AppTheme {
         headlineLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: AppColors.charcoal,
+          color: AppColors.primaryBrown, // استخدام Swatch 1 للنصوص الرئيسية
         ),
         headlineMedium: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: AppColors.charcoal,
+          color: AppColors.primaryBrown,
         ),
         headlineSmall: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.charcoal,
+          color: AppColors.primaryBrown,
         ),
         bodyLarge: TextStyle(
           fontSize: 16,
@@ -99,10 +103,26 @@ class AppTheme {
       // Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryGreen,
+          backgroundColor: AppColors.primaryBrown, // Swatch 1 للأزرار الأساسية
           foregroundColor: AppColors.white,
           elevation: 2,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+
+      // Text Button Theme
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.darkGold, // Swatch 3 للأزرار النصية
+        ),
+      ),
+
+      // Outlined Button Theme
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primaryBrown,
+          side: const BorderSide(color: AppColors.primaryBrown),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
@@ -117,7 +137,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryBrown, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
@@ -135,12 +155,26 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
+
+      // Floating Action Button Theme
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.brightGold, // Swatch 4 لزر الفعل العائم
+        foregroundColor: AppColors.primaryBrown,
+      ),
+
+      // Bottom Navigation Bar Theme
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.white,
+        selectedItemColor: AppColors.primaryBrown,
+        unselectedItemColor: AppColors.darkGray,
+      ),
     );
   }
 
+  // دالة مساعدة لإنشاء MaterialColor من لون عادي
   static MaterialColor createMaterialColor(Color color) {
     List strengths = <double>[.05];
-    Map<int, Color> swatch = <int, Color>{};
+    Map<int, Color> swatch = {};
     final int r = color.red, g = color.green, b = color.blue;
 
     for (int i = 1; i < 10; i++) {

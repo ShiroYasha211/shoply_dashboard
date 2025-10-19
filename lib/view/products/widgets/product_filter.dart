@@ -58,7 +58,7 @@ class ProductFilter extends StatelessWidget {
                 controller.isFilterExpanded.value
                     ? Icons.filter_alt
                     : Icons.filter_alt_outlined,
-                color: AppColors.primaryGreen,
+                color: AppColors.primaryBrown,
                 size: 20,
               ),
               title: const Text(

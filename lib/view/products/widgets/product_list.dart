@@ -55,7 +55,7 @@ class ProductList extends StatelessWidget {
         children: [
           const CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryBrown),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -235,7 +235,7 @@ class ProductList extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: isMobile ? 14 : 16,
-                                color: AppColors.primaryGreen,
+                                color: AppColors.primaryBrown,
                               ),
                             ),
                             const Spacer(),
@@ -259,7 +259,7 @@ class ProductList extends StatelessWidget {
                               child: _buildActionButton(
                                 icon: Icons.edit_outlined,
                                 label: 'تعديل',
-                                color: AppColors.primaryGreen,
+                                color: AppColors.primaryBrown,
                                 onPressed: () =>
                                     _showEditProductDialog(controller, product),
                                 isMobile: isMobile,
@@ -357,7 +357,7 @@ class ProductList extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: isMobile ? 14 : 16,
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBrown,
                           ),
                         ),
                         const Spacer(),
@@ -395,7 +395,7 @@ class ProductList extends StatelessWidget {
                 children: [
                   _buildIconButton(
                     icon: Icons.edit_outlined,
-                    color: AppColors.primaryGreen,
+                    color: AppColors.primaryBrown,
                     onPressed: () =>
                         _showEditProductDialog(controller, product),
                     isMobile: isMobile,
