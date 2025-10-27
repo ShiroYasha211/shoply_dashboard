@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 import '../../../data/models/category_model.dart';
@@ -50,17 +52,17 @@ class ProductList extends StatelessWidget {
 
   Widget _buildLoadingState() {
     return const Center(
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(
+          CircularProgressIndicator(
             strokeWidth: 2,
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryBrown),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'جاري تحميل المنتجات...',
-            style: const TextStyle(fontSize: 16, color: AppColors.darkGray),
+            style: TextStyle(fontSize: 16, color: AppColors.darkGray),
           ),
         ],
       ),
@@ -69,27 +71,27 @@ class ProductList extends StatelessWidget {
 
   Widget _buildEmptyState() {
     return const Center(
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.inventory_2_outlined,
             size: 64,
             color: AppColors.lightGray,
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'لا توجد منتجات',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.darkGray,
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
+          SizedBox(height: 8),
+          Text(
             'قم بإضافة منتجات جديدة لعرضها هنا',
-            style: const TextStyle(fontSize: 14, color: AppColors.darkGray),
+            style: TextStyle(fontSize: 14, color: AppColors.darkGray),
             textAlign: TextAlign.center,
           ),
         ],
@@ -167,7 +169,7 @@ class ProductList extends StatelessWidget {
                   height: isMobile ? 120 : 140,
                   width: double.infinity,
                   decoration: const BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(
+                    borderRadius: BorderRadius.vertical(
                       top: Radius.circular(12),
                     ),
                     color: AppColors.lightGray,
@@ -509,13 +511,455 @@ class ProductList extends StatelessWidget {
   }
 
   void _showProductDetails(ProductController controller, ProductModel product) {
-    // تفاصيل المنتج يمكن إضافتها لاحقاً
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 500.0;
+
     Get.dialog(
-      AlertDialog(
-        title: Text(product.name),
-        content: Text('تفاصيل المنتج: ${product.description ?? "لا يوجد وصف"}'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إغلاق')),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryBrown,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.shopping_bag_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
+                    ),
+                    SizedBox(width: isMobile ? 8 : 12),
+                    Expanded(
+                      child: Text(
+                        'تفاصيل المنتج',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(isMobile ? 16 : 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // صورة المنتج
+                      if (product.imageUrl != null)
+                        Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: isMobile ? 150 : 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade100,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  product.imageUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        Icons.image_not_supported_rounded,
+                                        size: 40,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    );
+                                  },
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.primaryBrown,
+                                          ),
+                                        );
+                                      },
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: isMobile ? 16 : 20),
+                          ],
+                        ),
+
+                      // معلومات أساسية
+                      _buildDetailSection(
+                        title: 'المعلومات الأساسية',
+                        isMobile: isMobile,
+                        children: [
+                          _buildDetailRow(
+                            icon: Icons.shopping_bag_rounded,
+                            label: 'اسم المنتج',
+                            value: product.name,
+                            isMobile: isMobile,
+                            valueStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: isMobile ? 15 : 16,
+                              color: AppColors.charcoal,
+                            ),
+                          ),
+                          _buildDetailRow(
+                            icon: Icons.description_rounded,
+                            label: 'الوصف',
+                            value: product.description ?? 'لا يوجد وصف',
+                            isMobile: isMobile,
+                            valueColor: product.description != null
+                                ? AppColors.darkGray
+                                : Colors.grey.shade500,
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: isMobile ? 16 : 20),
+
+                      // المعلومات المالية والمخزون
+                      _buildDetailSection(
+                        title: 'المعلومات المالية',
+                        isMobile: isMobile,
+                        children: [
+                          _buildDetailRow(
+                            icon: Icons.attach_money_rounded,
+                            label: 'السعر',
+                            value: '${product.price} ريال',
+                            isMobile: isMobile,
+                            valueStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green.shade700,
+                              fontSize: isMobile ? 15 : 16,
+                            ),
+                          ),
+                          _buildDetailRow(
+                            icon: Icons.inventory_2_rounded,
+                            label: 'الكمية المتاحة',
+                            value: '${product.stockQuantity} قطعة',
+                            isMobile: isMobile,
+                            valueStyle: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: product.stockQuantity > 0
+                                  ? Colors.blue.shade700
+                                  : Colors.red.shade700,
+                              fontSize: isMobile ? 15 : 16,
+                            ),
+                          ),
+                          if (product.stockQuantity <= 5 &&
+                              product.stockQuantity > 0)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.orange.shade200,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    size: 16,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'الكمية قاربت على النفاد',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.orange.shade700,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      SizedBox(height: isMobile ? 16 : 20),
+
+                      // معلومات إضافية
+                      _buildDetailSection(
+                        title: 'معلومات إضافية',
+                        isMobile: isMobile,
+                        children: [
+                          _buildDetailRow(
+                            icon: Icons.category,
+                            label: "التصنيف",
+                            value: product.categoryName ?? "غير محدد",
+                            isMobile: isMobile,
+                          ),
+                          _buildDetailRow(
+                            icon: Icons.category_rounded,
+                            label: 'التصنيف الفرعي',
+                            value: product.subcategoryName ?? 'لا يوجد',
+                            isMobile: isMobile,
+                          ),
+                          _buildDetailRow(
+                            icon: Icons.calendar_today_rounded,
+                            label: 'تاريخ الإضافة',
+                            value: DateFormat(
+                              'dd/MM/yyyy - HH:mm',
+                            ).format(product.createdAt),
+                            isMobile: isMobile,
+                          ),
+                        ],
+                      ),
+
+                      // حالة المخزون
+                      Container(
+                        margin: EdgeInsets.only(top: isMobile ? 16 : 20),
+                        padding: EdgeInsets.all(isMobile ? 12 : 16),
+                        decoration: BoxDecoration(
+                          color: product.stockQuantity > 0
+                              ? Colors.green.shade50
+                              : Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: product.stockQuantity > 0
+                                ? Colors.green.shade200
+                                : Colors.red.shade200,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              product.stockQuantity > 0
+                                  ? Icons.check_circle_rounded
+                                  : Icons.cancel_rounded,
+                              color: product.stockQuantity > 0
+                                  ? Colors.green.shade600
+                                  : Colors.red.shade600,
+                              size: isMobile ? 20 : 24,
+                            ),
+                            SizedBox(width: isMobile ? 8 : 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.stockQuantity > 0
+                                        ? 'متوفر في المخزون'
+                                        : 'غير متوفر',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 14 : 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: product.stockQuantity > 0
+                                          ? Colors.green.shade700
+                                          : Colors.red.shade700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    product.stockQuantity > 0
+                                        ? 'المنتج جاهز للطلبات'
+                                        : 'المنتج غير متوفر حاليًا',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 12 : 14,
+                                      color: product.stockQuantity > 0
+                                          ? Colors.green.shade600
+                                          : Colors.red.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: Colors.grey.shade300)),
+                ),
+                child: Row(
+                  children: [
+                    // معرف المنتج
+                    Expanded(
+                      child: Text(
+                        'ID: ${product.id}',
+                        style: TextStyle(
+                          fontSize: isMobile ? 12 : 14,
+                          color: Colors.grey.shade500,
+                          fontFamily: 'monospace',
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // زر الإغلاق
+                    SizedBox(
+                      width: isMobile ? 100 : 120,
+                      child: ElevatedButton(
+                        onPressed: () => Get.back(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryBrown,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobile ? 10 : 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'إغلاق',
+                          style: TextStyle(
+                            fontSize: isMobile ? 14 : 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // دالة مساعدة لبناء قسم التفاصيل
+  Widget _buildDetailSection({
+    required String title,
+    required bool isMobile,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.charcoal,
+          ),
+        ),
+        SizedBox(height: isMobile ? 8 : 12),
+        Container(
+          padding: EdgeInsets.all(isMobile ? 12 : 16),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+
+  // دالة مساعدة لبناء صف التفاصيل
+  Widget _buildDetailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required bool isMobile,
+    Color? valueColor,
+    TextStyle? valueStyle,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 6 : 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: isMobile ? 32 : 36,
+            height: isMobile ? 32 : 36,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              size: isMobile ? 16 : 18,
+              color: AppColors.primaryBrown,
+            ),
+          ),
+          SizedBox(width: isMobile ? 12 : 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style:
+                      valueStyle ??
+                      TextStyle(
+                        fontSize: isMobile ? 14 : 16,
+                        color: valueColor ?? AppColors.charcoal,
+                        fontWeight: FontWeight.w600,
+                      ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -525,24 +969,382 @@ class ProductList extends StatelessWidget {
     ProductController controller,
     ProductModel product,
   ) {
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
+
     Get.dialog(
-      AlertDialog(
-        title: const Text('حذف منتج'),
-        content: Text(
-          'هل تريد حذف "${product.name}"؟ هذا الإجراء لا يمكن التراجع عنه.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              controller.deleteProduct(product.id);
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('حذف'),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Icon
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_forever_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 12 : 16),
+                    // Title
+                    Text(
+                      'حذف المنتج',
+                      style: TextStyle(
+                        fontSize: isMobile ? 20 : 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Product Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          // Product Image or Icon
+                          Container(
+                            width: isMobile ? 50 : 60,
+                            height: isMobile ? 50 : 60,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: product.imageUrl != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      product.imageUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.shopping_bag_rounded,
+                                              color: Colors.grey.shade500,
+                                              size: isMobile ? 24 : 28,
+                                            );
+                                          },
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.shopping_bag_rounded,
+                                    color: Colors.grey.shade500,
+                                    size: isMobile ? 24 : 28,
+                                  ),
+                          ),
+                          SizedBox(width: isMobile ? 12 : 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product.name,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 16 : 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.charcoal,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${product.price} ريال',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    color: Colors.grey.shade600,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'الكمية: ${product.stockQuantity}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 12 : 14,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Warning Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.red,
+                            size: isMobile ? 20 : 24,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تنبيه مهم',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف المنتج بشكل دائم من النظام.',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 12 : 14,
+                                    color: Colors.red.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Additional Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: isMobile ? 14 : 16,
+                            color: Colors.orange.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'سيتم حذف جميع البيانات المرتبطة بهذا المنتج',
+                            style: TextStyle(
+                              fontSize: isMobile ? 11 : 12,
+                              color: Colors.orange.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Buttons
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Delete Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteProduct(product.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف المنتج',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Delete Button - Desktop
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteProduct(product.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف المنتج',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -593,13 +1395,18 @@ class ProductList extends StatelessWidget {
       controller.fetchSubcategoriesByCategory(selectedCategoryId);
     }
 
+    // تحديد حجم الدايلوج حسب نوع الجهاز
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 600.0;
+    final dialogHeight = isMobile ? Get.height * 0.9 : 700.0;
+
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(20),
         child: Container(
-          width: double.maxFinite,
-          constraints: const BoxConstraints(maxHeight: 700),
+          width: dialogWidth,
+          height: dialogHeight,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -609,30 +1416,41 @@ class ProductList extends StatelessWidget {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
                 decoration: const BoxDecoration(
                   color: AppColors.warning,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
                   ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.edit, color: Colors.white, size: 24),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'تعديل المنتج',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                    Icon(
+                      Icons.edit_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
+                    ),
+                    SizedBox(width: isMobile ? 8 : 12),
+                    Expanded(
+                      child: Text(
+                        'تعديل المنتج',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     IconButton(
                       onPressed: () => Get.back(),
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
@@ -641,9 +1459,13 @@ class ProductList extends StatelessWidget {
               // Content
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(isMobile ? 16 : 20),
                   child: Column(
                     children: [
+                      // معلومات المنتج الحالية
+                      _buildCurrentProductInfo(product, isMobile),
+                      SizedBox(height: isMobile ? 16 : 20),
+
                       // صورة المنتج
                       _buildImageUploadSection(
                         selectedImage: selectedImage,
@@ -654,8 +1476,9 @@ class ProductList extends StatelessWidget {
                           currentImageUrl = null;
                         },
                         isUploading: isUploading,
+                        isMobile: isMobile,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: isMobile ? 16 : 24),
 
                       // معلومات المنتج
                       _buildProductInfoSection(
@@ -663,20 +1486,21 @@ class ProductList extends StatelessWidget {
                         descriptionController: descriptionController,
                         priceController: priceController,
                         stockController: stockController,
+                        isMobile: isMobile,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: isMobile ? 16 : 24),
 
                       // الفئة والتصنيف الفرعي
                       _buildCategoryFilterForAdding(
-                        isMobile: false,
+                        isMobile: isMobile,
                         controller,
                         selectedCategory: (value) {
                           selectedCategoryId = value;
                         },
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: isMobile ? 12 : 16),
                       _buildSubcategoryFilterForAdding(
-                        isMobile: false,
+                        isMobile: isMobile,
                         controller,
                         selectedSubcategory: (value) {
                           selectedSubcategoryId = value;
@@ -689,113 +1513,185 @@ class ProductList extends StatelessWidget {
 
               // Actions
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
                 decoration: BoxDecoration(
                   border: Border(top: BorderSide(color: Colors.grey.shade300)),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Get.back(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: const BorderSide(color: AppColors.warning),
-                        ),
-                        child: const Text(
-                          'إلغاء',
-                          style: const TextStyle(color: AppColors.warning),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Obx(
-                        () => ElevatedButton(
-                          onPressed: controller.isLoading.value
-                              ? null
-                              : () async {
-                                  if (_validateProductForm(
-                                    nameController.text,
-                                    priceController.text,
-                                    stockController.text,
-                                    selectedCategoryId,
-                                    selectedSubcategoryId,
-                                  )) {
-                                    isUploading = true;
-
-                                    String? imageUrl = currentImageUrl;
-
-                                    // إذا تم اختيار صورة جديدة، قم برفعها
-                                    if (selectedImage != null) {
-                                      final fileName =
-                                          'product_${DateTime.now().millisecondsSinceEpoch}.jpg';
-                                      imageUrl =
-                                          await ImageUploadService.uploadImage(
-                                            selectedImage!,
-                                            fileName,
-                                          );
-
-                                      // حذف الصورة القديمة إذا كانت موجودة
-                                      if (currentImageUrl != null &&
-                                          currentImageUrl != imageUrl) {
-                                        await ImageUploadService.deleteImage(
-                                          currentImageUrl!,
-                                        );
-                                      }
-                                    }
-
-                                    // إذا تم إزالة الصورة، احذفها من التخزين
-                                    if (currentImageUrl == null &&
-                                        product.imageUrl != null) {
-                                      await ImageUploadService.deleteImage(
-                                        product.imageUrl!,
-                                      );
-                                    }
-
-                                    final updatedProduct = product.copyWith(
-                                      subcategoryId: selectedSubcategoryId,
-                                      name: nameController.text,
-                                      description:
-                                          descriptionController.text.isEmpty
-                                          ? null
-                                          : descriptionController.text,
-                                      price: double.parse(priceController.text),
-                                      stockQuantity: int.parse(
-                                        stockController.text,
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // زر الحفظ في الموبايل
+                          Obx(
+                            () => SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () => _handleUpdateProduct(
+                                        controller,
+                                        product,
+                                        nameController,
+                                        descriptionController,
+                                        priceController,
+                                        stockController,
+                                        selectedCategoryId,
+                                        selectedSubcategoryId,
+                                        selectedImage,
+                                        currentImageUrl,
+                                        isUploading,
                                       ),
-                                      imageUrl: imageUrl,
-                                    );
-
-                                    await controller.updateProduct(
-                                      product.id,
-                                      updatedProduct,
-                                    );
-                                    isUploading = false;
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.warning,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: controller.isLoading.value
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.warning,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
                                   ),
-                                )
-                              : const Text(
-                                  'حفظ التعديلات',
-                                  style: TextStyle(color: Colors.white),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                        ),
+                                child: controller.isLoading.value
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.save_rounded, size: 20),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'حفظ التعديلات',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // زر الإلغاء في الموبايل
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                side: const BorderSide(
+                                  color: AppColors.warning,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  color: AppColors.warning,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // زر الإلغاء في الديسكتوب
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                side: const BorderSide(
+                                  color: AppColors.warning,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  color: AppColors.warning,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // زر الحفظ في الديسكتوب
+                          Expanded(
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () => _handleUpdateProduct(
+                                        controller,
+                                        product,
+                                        nameController,
+                                        descriptionController,
+                                        priceController,
+                                        stockController,
+                                        selectedCategoryId,
+                                        selectedSubcategoryId,
+                                        selectedImage,
+                                        currentImageUrl,
+                                        isUploading,
+                                      ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.warning,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: controller.isLoading.value
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.save_rounded, size: 20),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'حفظ التعديلات',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),
@@ -804,186 +1700,294 @@ class ProductList extends StatelessWidget {
     );
   }
 
+  // دالة منفصلة للتعامل مع تحديث المنتج
+  Future<void> _handleUpdateProduct(
+    ProductController controller,
+    ProductModel product,
+    TextEditingController nameController,
+    TextEditingController descriptionController,
+    TextEditingController priceController,
+    TextEditingController stockController,
+    String? selectedCategoryId,
+    String? selectedSubcategoryId,
+    File? selectedImage,
+    String? currentImageUrl,
+    bool isUploading,
+  ) async {
+    if (_validateProductForm(
+      nameController.text,
+      priceController.text,
+      stockController.text,
+      selectedCategoryId,
+      selectedSubcategoryId,
+    )) {
+      isUploading = true;
+
+      String? imageUrl = currentImageUrl;
+
+      // إذا تم اختيار صورة جديدة، قم برفعها
+      if (selectedImage != null) {
+        final fileName = 'product_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        imageUrl = await ImageUploadService.uploadImage(
+          selectedImage,
+          fileName,
+        );
+
+        // حذف الصورة القديمة إذا كانت موجودة
+        if (currentImageUrl != null && currentImageUrl != imageUrl) {
+          await ImageUploadService.deleteImage(currentImageUrl);
+        }
+      }
+
+      // إذا تم إزالة الصورة، احذفها من التخزين
+      if (currentImageUrl == null && product.imageUrl != null) {
+        await ImageUploadService.deleteImage(product.imageUrl!);
+      }
+
+      final updatedProduct = product.copyWith(
+        subcategoryId: selectedSubcategoryId,
+        name: nameController.text,
+        description: descriptionController.text.isEmpty
+            ? null
+            : descriptionController.text,
+        price: double.parse(priceController.text),
+        stockQuantity: int.parse(stockController.text),
+        imageUrl: imageUrl,
+      );
+
+      await controller.updateProduct(product.id, updatedProduct);
+      isUploading = false;
+
+      // إغلاق الدايلوج بعد التحديث الناجح
+      if (!controller.isLoading.value) {
+        Get.back();
+      }
+    }
+  }
+
+  // دالة لعرض معلومات المنتج الحالية
+  Widget _buildCurrentProductInfo(ProductModel product, bool isMobile) {
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 12 : 16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: Colors.blue.shade600,
+            size: isMobile ? 18 : 20,
+          ),
+          SizedBox(width: isMobile ? 8 : 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'المعلومات الحالية',
+                  style: TextStyle(
+                    fontSize: isMobile ? 14 : 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ID: ${product.id}',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.blue.shade600,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // نسخة محسنة من دالة رفع الصورة مع دعم الموبايل
   Widget _buildImageUploadSection({
     required File? selectedImage,
+    required String? currentImageUrl,
     required Function(File) onImageSelected,
+    required Function() onImageRemoved,
     required bool isUploading,
-    String? currentImageUrl, // إضافة للمنتج الحالي
-    Function()? onImageRemoved, // إضافة لإزالة الصورة
+    required bool isMobile,
   }) {
-    final hasImage = selectedImage != null || currentImageUrl != null;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               'صورة المنتج',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: isMobile ? 16 : 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.charcoal,
               ),
             ),
-            if (hasImage) ...[
-              const Spacer(),
-              TextButton.icon(
-                onPressed: onImageRemoved,
-                icon: const Icon(Icons.delete, size: 16),
-                label: const Text('إزالة الصورة'),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            if (currentImageUrl != null) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Text(
+                  'موجودة',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ],
           ],
         ),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: isUploading
-              ? null
-              : () async {
-                  Get.bottomSheet(
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.photo_library),
-                            title: const Text('اختيار من المعرض'),
-                            onTap: () async {
-                              Get.back();
-                              final image =
-                                  await ImageUploadService.pickImageFromGallery();
-                              if (image != null) {
-                                onImageSelected(image);
-                              }
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt),
-                            title: const Text('التقاط صورة'),
-                            onTap: () async {
-                              Get.back();
-                              final image =
-                                  await ImageUploadService.pickImageFromCamera();
-                              if (image != null) {
-                                onImageSelected(image);
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-          child: Container(
-            width: double.infinity,
-            height: 200,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: hasImage ? Colors.transparent : Colors.grey.shade300,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey.shade50,
-            ),
-            child: Stack(
-              children: [
-                // عرض الصورة المختارة أو الحالية
-                if (selectedImage != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      selectedImage,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
-                  )
-                else if (currentImageUrl != null && currentImageUrl.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: CachedNetworkImage(
-                      imageUrl: currentImageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey.shade200,
-                        child: const Icon(Icons.error),
-                      ),
-                    ),
-                  )
-                else
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.cloud_upload,
-                        size: 48,
-                        color: Colors.grey.shade400,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'انقر لرفع صورة المنتج',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'اسحب الصورة هنا أو انقر للاختيار',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+        SizedBox(height: isMobile ? 8 : 12),
 
-                // زر التعديل يظهر عند وجود صورة
-                if (hasImage)
-                  Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+        // عرض الصورة الحالية أو الجديدة
+        if (currentImageUrl != null || selectedImage != null)
+          Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: isMobile ? 120 : 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey.shade50,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: selectedImage != null
+                      ? Image.file(selectedImage, fit: BoxFit.cover)
+                      : Image.network(
+                          currentImageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.image_not_supported_rounded,
+                                size: 40,
+                                color: Colors.grey.shade400,
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+
+        // زر اختيار الصورة
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  if (isUploading) return;
+
+                  final image = await ImagePicker().pickImage(
+                    source: ImageSource.gallery,
+                  );
+                  if (image != null) {
+                    onImageSelected(File(image.path));
+                  }
+                },
+                child: Container(
+                  height: isMobile ? 50 : 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.grey.shade600,
+                          size: isMobile ? 18 : 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'اختيار صورة جديدة',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: isMobile ? 14 : 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+              ),
+            ),
+            if (currentImageUrl != null || selectedImage != null) ...[
+              const SizedBox(width: 8),
+              SizedBox(
+                width: isMobile ? 50 : 60,
+                child: ElevatedButton(
+                  onPressed: onImageRemoved,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade50,
+                    foregroundColor: Colors.red,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Icon(Icons.delete_rounded, size: isMobile ? 18 : 20),
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        if (isUploading)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.orange.shade600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'جاري رفع الصورة...',
+                  style: TextStyle(fontSize: 12, color: Colors.orange.shade600),
+                ),
               ],
             ),
           ),
-        ),
-        if (isUploading) ...[
-          const SizedBox(height: 8),
-          const LinearProgressIndicator(),
-          const SizedBox(height: 4),
-          const Text(
-            'جاري رفع الصورة...',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
-        ],
       ],
     );
   }
@@ -993,67 +1997,167 @@ class ProductList extends StatelessWidget {
     required TextEditingController descriptionController,
     required TextEditingController priceController,
     required TextEditingController stockController,
+    bool isMobile = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'معلومات المنتج',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: isMobile ? 16 : 18,
             fontWeight: FontWeight.bold,
             color: AppColors.charcoal,
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: isMobile ? 12 : 16),
+
+        // اسم المنتج
         TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'اسم المنتج *',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.shopping_bag),
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.shopping_bag_outlined),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 14 : 16,
+            ),
           ),
+          style: TextStyle(fontSize: isMobile ? 14 : 16),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: isMobile ? 12 : 16),
+
+        // وصف المنتج
         TextField(
           controller: descriptionController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'وصف المنتج',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
             alignLabelWithHint: true,
-            prefixIcon: Icon(Icons.description),
+            prefixIcon: const Icon(Icons.description_outlined),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 12 : 16,
+              vertical: isMobile ? 14 : 16,
+            ),
           ),
-          maxLines: 3,
+          maxLines: isMobile ? 2 : 3,
+          style: TextStyle(fontSize: isMobile ? 14 : 16),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: priceController,
-                decoration: const InputDecoration(
-                  labelText: 'السعر *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.attach_money),
-                ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+        SizedBox(height: isMobile ? 12 : 16),
+
+        // السعر والكمية
+        isMobile
+            ? Column(
+                children: [
+                  // السعر في الموبايل
+                  TextField(
+                    controller: priceController,
+                    decoration: const InputDecoration(
+                      labelText: 'السعر *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.attach_money_rounded),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // الكمية في الموبايل
+                  TextField(
+                    controller: stockController,
+                    decoration: const InputDecoration(
+                      labelText: 'الكمية *',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.inventory_2_outlined),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 14,
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  // السعر في الديسكتوب
+                  Expanded(
+                    child: TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(
+                        labelText: 'السعر *',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.attach_money_rounded),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+
+                  // الكمية في الديسكتوب
+                  Expanded(
+                    child: TextField(
+                      controller: stockController,
+                      decoration: const InputDecoration(
+                        labelText: 'الكمية *',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.inventory_2_outlined),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+
+        // معلومات إضافية
+        Container(
+          margin: EdgeInsets.only(top: isMobile ? 8 : 12),
+          padding: EdgeInsets.all(isMobile ? 8 : 12),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.blue.shade100),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: isMobile ? 16 : 18,
+                color: Colors.blue.shade600,
+              ),
+              SizedBox(width: isMobile ? 8 : 12),
+              Expanded(
+                child: Text(
+                  'الحقول المميزة بـ * إلزامية',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.blue.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextField(
-                controller: stockController,
-                decoration: const InputDecoration(
-                  labelText: 'الكمية *',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.inventory),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
