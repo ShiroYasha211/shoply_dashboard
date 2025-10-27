@@ -117,29 +117,29 @@ class CategoriesView extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchAndFilters(CategoryController controller, bool isMobile) {
-    return Card(
-      elevation: 1,
-      child: Padding(
-        padding: EdgeInsets.all(isMobile ? 10 : 16),
-        child: TextField(
-          onChanged: (value) {
-            // يمكن إضافة دالة بحث هنا إذا كانت موجودة في الـ Controller
-          },
-          decoration: InputDecoration(
-            hintText: 'ابحث عن فئة...',
-            prefixIcon: const Icon(Icons.search),
-            border: const OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 12 : 16,
-              vertical: isMobile ? 12 : 16,
-            ),
-            isDense: true,
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSearchAndFilters(CategoryController controller, bool isMobile) {
+  //   return Card(
+  //     elevation: 1,
+  //     child: Padding(
+  //       padding: EdgeInsets.all(isMobile ? 10 : 16),
+  //       child: TextField(
+  //         onChanged: (value) {
+  //           // يمكن إضافة دالة بحث هنا إذا كانت موجودة في الـ Controller
+  //         },
+  //         decoration: InputDecoration(
+  //           hintText: 'ابحث عن فئة...',
+  //           prefixIcon: const Icon(Icons.search),
+  //           border: const OutlineInputBorder(),
+  //           contentPadding: EdgeInsets.symmetric(
+  //             horizontal: isMobile ? 12 : 16,
+  //             vertical: isMobile ? 12 : 16,
+  //           ),
+  //           isDense: true,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildCategoriesContent(CategoryController controller, bool isMobile) {
     return Obx(() {
@@ -239,6 +239,7 @@ class CategoriesView extends StatelessWidget {
           ],
         ),
         trailing: PopupMenuButton<String>(
+          color: AppColors.lightGray,
           icon: Icon(Icons.more_vert, size: isMobile ? 18 : 20),
           onSelected: (value) {
             if (value == 'edit') {
@@ -375,6 +376,7 @@ class CategoriesView extends StatelessWidget {
           ),
         ),
         trailing: PopupMenuButton<String>(
+          color: AppColors.lightGray,
           icon: Icon(Icons.more_vert, size: isMobile ? 16 : 18),
           onSelected: (value) {
             if (value == 'edit') {
@@ -412,35 +414,373 @@ class CategoriesView extends StatelessWidget {
 
   void _showAddCategoryDialog(CategoryController controller) {
     final nameController = TextEditingController();
-    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('إضافة فئة جديدة'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'اسم الفئة',
-            border: const OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: isMobile ? 12 : 16,
-            ),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryBrown,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.category_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
+                    ),
+                    SizedBox(width: isMobile ? 8 : 12),
+                    Expanded(
+                      child: Text(
+                        'إضافة فئة جديدة',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Icon Section
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBrown.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add_circle_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: AppColors.primaryBrown,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Instruction Text
+                    Text(
+                      'أدخل اسم الفئة الجديدة',
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.charcoal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+                    Text(
+                      'سيتم إنشاء فئة جديدة يمكنك إضافة تصنيفات فرعية لها لاحقاً',
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14,
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 20 : 24),
+
+                    // Text Field
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'اسم الفئة',
+                        hintText: 'أدخل اسم الفئة هنا...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.primaryBrown,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: isMobile ? 14 : 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.category_rounded,
+                          color: Colors.grey.shade500,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        color: AppColors.charcoal,
+                      ),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          controller.addCategory(value.trim());
+                          Get.back();
+                        }
+                      },
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Validation Message
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primaryBrown,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'جاري إضافة الفئة...',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    }),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Add Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          controller.addCategory(
+                                            nameController.text.trim(),
+                                          );
+                                          Get.back();
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم الفئة',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryBrown,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'إضافة الفئة',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Add Button - Desktop
+                          Expanded(
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          controller.addCategory(
+                                            nameController.text.trim(),
+                                          );
+                                          Get.back();
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم الفئة',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryBrown,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'إضافة الفئة',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.trim().isNotEmpty) {
-                controller.addCategory(nameController.text.trim());
-                Get.back();
-              }
-            },
-            child: const Text('إضافة'),
-          ),
-        ],
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -449,38 +789,480 @@ class CategoriesView extends StatelessWidget {
     Category category,
   ) {
     final nameController = TextEditingController(text: category.name);
-    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('تعديل الفئة'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'اسم الفئة',
-            border: const OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: isMobile ? 12 : 16,
-            ),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: const BoxDecoration(
+                  color: AppColors.warning,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
+                    ),
+                    SizedBox(width: isMobile ? 8 : 12),
+                    Expanded(
+                      child: Text(
+                        'تعديل الفئة',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Icon Section
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: AppColors.warning,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Current Category Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.blue.shade600,
+                            size: isMobile ? 18 : 20,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'الفئة الحالية',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  category.name,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13 : 14,
+                                    color: Colors.grey.shade700,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'ID: ${category.id}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 11 : 12,
+                                    color: Colors.grey.shade500,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Instruction Text
+                    Text(
+                      'قم بتعديل اسم الفئة',
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.charcoal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+                    Text(
+                      'سيتم تحديث اسم الفئة في جميع المنتج المرتبطة بها',
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14,
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 20 : 24),
+
+                    // Text Field
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'اسم الفئة الجديد',
+                        hintText: 'أدخل الاسم الجديد للفئة...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: AppColors.warning,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: isMobile ? 14 : 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.category_rounded,
+                          color: Colors.grey.shade500,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        color: AppColors.charcoal,
+                      ),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          controller.updateCategory(category.id, value.trim());
+                          Get.back();
+                        }
+                      },
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Warning Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            size: isMobile ? 16 : 18,
+                            color: Colors.orange.shade600,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Text(
+                              'سيؤثر هذا التغيير على جميع المنتجات في هذه الفئة',
+                              style: TextStyle(
+                                fontSize: isMobile ? 12 : 13,
+                                color: Colors.orange.shade700,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Validation Message
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.warning,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'جاري تحديث الفئة...',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    }),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Update Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          if (nameController.text.trim() !=
+                                              category.name) {
+                                            controller.updateCategory(
+                                              category.id,
+                                              nameController.text.trim(),
+                                            );
+                                            Get.back();
+                                          } else {
+                                            Get.snackbar(
+                                              'ملاحظة',
+                                              'لم تقم بتغيير اسم الفئة',
+                                              backgroundColor: Colors.blue,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم الفئة',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.warning,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'حفظ التغييرات',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Update Button - Desktop
+                          Expanded(
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          if (nameController.text.trim() !=
+                                              category.name) {
+                                            controller.updateCategory(
+                                              category.id,
+                                              nameController.text.trim(),
+                                            );
+                                            Get.back();
+                                          } else {
+                                            Get.snackbar(
+                                              'ملاحظة',
+                                              'لم تقم بتغيير اسم الفئة',
+                                              backgroundColor: Colors.blue,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم الفئة',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.warning,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'حفظ التغييرات',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.trim().isNotEmpty) {
-                controller.updateCategory(
-                  category.id,
-                  nameController.text.trim(),
-                );
-                Get.back();
-              }
-            },
-            child: const Text('تحديث'),
-          ),
-        ],
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -489,38 +1271,460 @@ class CategoriesView extends StatelessWidget {
     Category category,
   ) {
     final nameController = TextEditingController();
-    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('إضافة فئة فرعية'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'اسم الفئة الفرعية',
-            border: const OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: isMobile ? 12 : 16,
-            ),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.subdirectory_arrow_right_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 20 : 24,
+                    ),
+                    SizedBox(width: isMobile ? 8 : 12),
+                    Expanded(
+                      child: Text(
+                        'إضافة تصنيف فرعي',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Parent Category Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue.shade100),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.category_rounded,
+                            color: Colors.blue.shade600,
+                            size: isMobile ? 18 : 20,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'الفئة الرئيسية',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  category.name,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13 : 14,
+                                    color: Colors.grey.shade700,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'ID: ${category.id}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 11 : 12,
+                                    color: Colors.grey.shade500,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Icon Section
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add_circle_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: Colors.green.shade600,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Instruction Text
+                    Text(
+                      'أدخل اسم التصنيف الفرعي الجديد',
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.charcoal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+                    Text(
+                      'سيتم إنشاء تصنيف فرعي جديد ضمن الفئة "${category.name}"',
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14,
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 20 : 24),
+
+                    // Text Field
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'اسم التصنيف الفرعي',
+                        hintText: 'أدخل اسم التصنيف الفرعي هنا...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.green.shade600,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: isMobile ? 14 : 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.subdirectory_arrow_right_rounded,
+                          color: Colors.grey.shade500,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        color: AppColors.charcoal,
+                      ),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          controller.addSubcategory(category.id, value.trim());
+                          Get.back();
+                        }
+                      },
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Info Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: isMobile ? 16 : 18,
+                            color: Colors.green.shade600,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Text(
+                              'يمكنك إضافة المنتجات لهذا التصنيف الفرعي بعد إنشائه',
+                              style: TextStyle(
+                                fontSize: isMobile ? 12 : 13,
+                                color: Colors.green.shade700,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Validation Message
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.green.shade600,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'جاري إضافة التصنيف الفرعي...',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    }),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Add Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          controller.addSubcategory(
+                                            category.id,
+                                            nameController.text.trim(),
+                                          );
+                                          Get.back();
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم التصنيف الفرعي',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'إضافة التصنيف',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Add Button - Desktop
+                          Expanded(
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          controller.addSubcategory(
+                                            category.id,
+                                            nameController.text.trim(),
+                                          );
+                                          Get.back();
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم التصنيف الفرعي',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'إضافة التصنيف',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.trim().isNotEmpty) {
-                controller.addSubcategory(
-                  category.id,
-                  nameController.text.trim(),
-                );
-                Get.back();
-              }
-            },
-            child: const Text('إضافة'),
-          ),
-        ],
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -528,24 +1732,415 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     Category category,
   ) {
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
+    final hasSubcategories =
+        category.subcategories != null && category.subcategories!.isNotEmpty;
+
     Get.dialog(
-      AlertDialog(
-        title: const Text('حذف فئة'),
-        content: Text(
-          'هل تريد حذف فئة "${category.name}"؟ هذا الإجراء لا يمكن التراجع عنه.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              controller.deleteCategory(category.id);
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('حذف'),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Icon
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_forever_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 12 : 16),
+                    // Title
+                    Text(
+                      'حذف الفئة',
+                      style: TextStyle(
+                        fontSize: isMobile ? 20 : 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Category Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          // Category Icon
+                          Container(
+                            width: isMobile ? 50 : 60,
+                            height: isMobile ? 50 : 60,
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.category_rounded,
+                              color: Colors.red,
+                              size: isMobile ? 24 : 28,
+                            ),
+                          ),
+                          SizedBox(width: isMobile ? 12 : 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  category.name,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 16 : 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.charcoal,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'ID: ${category.id}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 12 : 14,
+                                    color: Colors.grey.shade500,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                if (hasSubcategories)
+                                  Text(
+                                    '${category.subcategories!.length} تصنيف فرعي',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 12 : 14,
+                                      color: Colors.orange.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Warning Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.red,
+                            size: isMobile ? 20 : 24,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تنبيه مهم',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14 : 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف الفئة بشكل دائم من النظام.',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 12 : 14,
+                                    color: Colors.red.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 12 : 16),
+
+                    // Subcategories Warning
+                    if (hasSubcategories)
+                      Container(
+                        padding: EdgeInsets.all(isMobile ? 12 : 16),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.orange.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline_rounded,
+                              color: Colors.orange.shade700,
+                              size: isMobile ? 18 : 20,
+                            ),
+                            SizedBox(width: isMobile ? 8 : 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'تحذير: تحتوي على تصنيفات فرعية',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 13 : 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange.shade700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'سيتم حذف جميع التصنيفات الفرعية والمنتجات المرتبطة بها أيضاً',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 11 : 12,
+                                      color: Colors.orange.shade600,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Additional Info
+                    Container(
+                      margin: EdgeInsets.only(top: isMobile ? 12 : 16),
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: isMobile ? 14 : 16,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'سيتم حذف جميع البيانات المرتبطة بهذه الفئة',
+                            style: TextStyle(
+                              fontSize: isMobile ? 11 : 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Buttons
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Delete Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteCategory(category.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف الفئة',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Delete Button - Desktop
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteCategory(category.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف الفئة',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -554,38 +2149,541 @@ class CategoriesView extends StatelessWidget {
     Subcategory subcategory,
   ) {
     final nameController = TextEditingController(text: subcategory.name);
-    final isMobile = MediaQuery.of(Get.context!).size.width < 600;
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
+
+    // البحث عن الفئة الرئيسية
+    String? parentCategoryName;
+    for (var category in controller.categories) {
+      if (category.id == subcategory.categoryId) {
+        parentCategoryName = category.name;
+        break;
+      }
+    }
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('تعديل الفئة الفرعية'),
-        content: TextField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: 'اسم الفئة الفرعية',
-            border: const OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: isMobile ? 12 : 16,
-            ),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade600,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_rounded,
+                      color: Colors.white,
+                      size: isMobile ? 16 : 20,
+                    ),
+                    SizedBox(width: isMobile ? 2 : 6),
+                    Expanded(
+                      child: Text(
+                        'تعديل التصنيف الفرعي',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isMobile ? 15 : 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 20,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                child: Column(
+                  children: [
+                    // Icon Section
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        size: isMobile ? 35 : 40,
+                        color: Colors.orange.shade600,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Current Subcategory Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.blue.shade100),
+                      ),
+                      child: Column(
+                        children: [
+                          // Parent Category
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.category_rounded,
+                                color: Colors.blue.shade600,
+                                size: isMobile ? 16 : 18,
+                              ),
+                              SizedBox(width: isMobile ? 8 : 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'الفئة الرئيسية',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 12 : 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      parentCategoryName ?? 'غير معروف',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 14 : 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: isMobile ? 8 : 12),
+                          // Current Name
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.subdirectory_arrow_right_rounded,
+                                color: Colors.blue.shade600,
+                                size: isMobile ? 16 : 18,
+                              ),
+                              SizedBox(width: isMobile ? 8 : 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'الاسم الحالي',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 12 : 14,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      subcategory.name,
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 14 : 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.charcoal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: isMobile ? 4 : 6),
+                          // ID
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline_rounded,
+                                color: Colors.grey.shade500,
+                                size: isMobile ? 14 : 16,
+                              ),
+                              SizedBox(width: isMobile ? 8 : 12),
+                              Text(
+                                'ID: ${subcategory.id}',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 11 : 12,
+                                  color: Colors.grey.shade500,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 16 : 20),
+
+                    // Instruction Text
+                    Text(
+                      'قم بتعديل اسم التصنيف الفرعي',
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.charcoal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+                    Text(
+                      'سيتم تحديث اسم التصنيف الفرعي في جميع المنتجات المرتبطة به',
+                      style: TextStyle(
+                        fontSize: isMobile ? 13 : 14,
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: isMobile ? 20 : 24),
+
+                    // Text Field
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'اسم التصنيف الفرعي الجديد',
+                        hintText: 'أدخل الاسم الجديد للتصنيف الفرعي...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.orange.shade600,
+                            width: 2,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: isMobile ? 14 : 16,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.subdirectory_arrow_right_rounded,
+                          color: Colors.grey.shade500,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                      ),
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 18,
+                        color: AppColors.charcoal,
+                      ),
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty &&
+                            value.trim() != subcategory.name) {
+                          controller.updateSubcategory(
+                            subcategory.id,
+                            value.trim(),
+                          );
+                          Get.back();
+                        }
+                      },
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+
+                    // Warning Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            size: isMobile ? 16 : 18,
+                            color: Colors.orange.shade600,
+                          ),
+                          SizedBox(width: isMobile ? 8 : 12),
+                          Expanded(
+                            child: Text(
+                              'سيؤثر هذا التغيير على جميع المنتجات في هذا التصنيف الفرعي',
+                              style: TextStyle(
+                                fontSize: isMobile ? 12 : 13,
+                                color: Colors.orange.shade700,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 5 : 9),
+
+                    // Validation Message
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.orange.shade600,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'جاري تحديث التصنيف الفرعي...',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox(height: 0, width: 0);
+                    }),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Update Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          if (nameController.text.trim() !=
+                                              subcategory.name) {
+                                            controller.updateSubcategory(
+                                              subcategory.id,
+                                              nameController.text.trim(),
+                                            );
+                                            Get.back();
+                                          } else {
+                                            Get.snackbar(
+                                              'ملاحظة',
+                                              'لم تقم بتغيير اسم التصنيف الفرعي',
+                                              backgroundColor: Colors.blue,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم التصنيف الفرعي',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'حفظ التغييرات',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                'إلغاء',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Update Button - Desktop
+                          Expanded(
+                            child: Obx(
+                              () => ElevatedButton(
+                                onPressed: controller.isLoading.value
+                                    ? null
+                                    : () {
+                                        if (nameController.text
+                                            .trim()
+                                            .isNotEmpty) {
+                                          if (nameController.text.trim() !=
+                                              subcategory.name) {
+                                            controller.updateSubcategory(
+                                              subcategory.id,
+                                              nameController.text.trim(),
+                                            );
+                                            Get.back();
+                                          } else {
+                                            Get.snackbar(
+                                              'ملاحظة',
+                                              'لم تقم بتغيير اسم التصنيف الفرعي',
+                                              backgroundColor: Colors.blue,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        } else {
+                                          Get.snackbar(
+                                            'خطأ',
+                                            'يرجى إدخال اسم التصنيف الفرعي',
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange.shade600,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.save_rounded, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'حفظ التغييرات',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.trim().isNotEmpty) {
-                controller.updateSubcategory(
-                  subcategory.id,
-                  nameController.text.trim(),
-                );
-                Get.back();
-              }
-            },
-            child: const Text('تحديث'),
-          ),
-        ],
       ),
+      barrierDismissible: true,
     );
   }
 
@@ -593,24 +2691,458 @@ class CategoriesView extends StatelessWidget {
     CategoryController controller,
     Subcategory subcategory,
   ) {
+    final isMobile = Get.width < 768;
+    final dialogWidth = isMobile ? Get.width * 0.95 : 450.0;
+
+    // البحث عن الفئة الرئيسية
+    String? parentCategoryName;
+    for (var category in controller.categories) {
+      if (category.id == subcategory.categoryId) {
+        parentCategoryName = category.name;
+        break;
+      }
+    }
+
     Get.dialog(
-      AlertDialog(
-        title: const Text('حذف فئة فرعية'),
-        content: Text(
-          'هل تريد حذف الفئة الفرعية "${subcategory.name}"؟ هذا الإجراء لا يمكن التراجع عنه.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('إلغاء')),
-          ElevatedButton(
-            onPressed: () {
-              controller.deleteSubcategory(subcategory.id);
-              Get.back();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('حذف'),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: dialogWidth,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(isMobile ? 20 : 24),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Icon
+                    Container(
+                      width: isMobile ? 70 : 80,
+                      height: isMobile ? 70 : 80,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_forever_rounded,
+                        size: isMobile ? 25 : 30,
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: isMobile ? 8 : 12),
+                    // Title
+                    Text(
+                      'حذف التصنيف الفرعي',
+                      style: TextStyle(
+                        fontSize: isMobile ? 15 : 17,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 15 : 19),
+                child: Column(
+                  children: [
+                    // Subcategory Info
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Column(
+                        children: [
+                          // Parent Category
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.category_rounded,
+                                color: Colors.blue.shade600,
+                                size: isMobile ? 15 : 17,
+                              ),
+                              SizedBox(width: isMobile ? 5 : 9),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'الفئة الرئيسية',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 8 : 10,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    Text(
+                                      parentCategoryName ?? 'غير معروف',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 10 : 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.blue.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: isMobile ? 10 : 14),
+                          // Subcategory Details
+                          Row(
+                            children: [
+                              // Subcategory Icon
+                              Container(
+                                width: isMobile ? 50 : 60,
+                                height: isMobile ? 50 : 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.subdirectory_arrow_right_rounded,
+                                  color: Colors.red,
+                                  size: isMobile ? 20 : 24,
+                                ),
+                              ),
+                              SizedBox(width: isMobile ? 8 : 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      subcategory.name,
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 12 : 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.charcoal,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'ID: ${subcategory.id}',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 8 : 12,
+                                        color: Colors.grey.shade500,
+                                        fontFamily: 'monospace',
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'تم الإنشاء: ${DateFormat('dd/MM/yyyy').format(subcategory.createdAt)}',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 11 : 12,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 10 : 14),
+
+                    // Warning Message
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 12 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withOpacity(0.2)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.red,
+                            size: isMobile ? 14 : 18,
+                          ),
+                          SizedBox(width: isMobile ? 6 : 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تنبيه مهم',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 10 : 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'هذا الإجراء لا يمكن التراجع عنه. سيتم حذف التصنيف الفرعي بشكل دائم من النظام.',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 8 : 10,
+                                    color: Colors.red.shade700,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: isMobile ? 12 : 16),
+
+                    // Products Warning
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 8 : 16),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.orange.shade700,
+                            size: isMobile ? 14 : 16,
+                          ),
+                          SizedBox(width: isMobile ? 4 : 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'تحذير: تأثير على المنتجات',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 8 : 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'سيتم حذف جميع المنتجات المرتبطة بهذا التصنيف الفرعي أيضاً',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 7 : 12,
+                                    color: Colors.orange.shade600,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Additional Info
+                    Container(
+                      margin: EdgeInsets.only(top: isMobile ? 12 : 16),
+                      padding: EdgeInsets.all(isMobile ? 10 : 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: isMobile ? 14 : 16,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'سيتم حذف جميع البيانات المرتبطة بهذا التصنيف الفرعي',
+                            style: TextStyle(
+                              fontSize: isMobile ? 11 : 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Buttons
+              Container(
+                padding: EdgeInsets.all(isMobile ? 16 : 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          // Delete Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteSubcategory(subcategory.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف التصنيف',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Cancel Button - Mobile
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          // Cancel Button - Desktop
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Get.back(),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.grey.shade700,
+                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'إلغاء الحذف',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 16 : 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Delete Button - Desktop
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                controller.deleteSubcategory(subcategory.id);
+                                Get.back();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 14 : 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete_rounded,
+                                    size: isMobile ? 18 : 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'حذف التصنيف',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 16 : 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
+      barrierDismissible: true,
     );
   }
 }
